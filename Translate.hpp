@@ -1,0 +1,10 @@
+#ifndef CS323_PROJ3_TRANSLATE_HPP
+#define CS323_PROJ3_TRANSLATE_HPP
+
+
+class Translate {
+
+};
+
+
+#endif //CS323_PROJ3_TRANSLATE_HPP

@@ -34,3 +34,6 @@ splc: bin .spl_node .spl_type .symbol_table
 clean:
 	@rm -rf $(BIN)/
 	@rm -rf $(MAKE_PATH)/ lex.yy.c syntax.tab.* syntax.output
+
+# todo: Translate.cpp/hpp
+# todo: InterCode.cpp/hpp
