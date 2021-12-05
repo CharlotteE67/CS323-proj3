@@ -10,8 +10,7 @@ string new_place();
 
 string new_label();
 
-vector<InterCode> translate_cond_Exp(Node *exp, string l1, string l2);
+vector<InterCode> translate_cond_Exp(Node *exp, string lt, string lf);
 
-
-
+vector<InterCode> translate_Exp(Node *exp,string t);
 #endif //CS323_PROJ3_TRANSLATE_HPP
