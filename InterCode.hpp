@@ -14,12 +14,14 @@ enum class InterCodeType {
 
 class InterCode {
 public:
-    int interCodeType; // todo: change to enum
+    int interCodeType{}; // todo: change to enum
     string x;
     string y;
     string z;
 
     InterCode();
+
+    InterCode(int type, string x = "", string y = "", string z = "");
 };
 
 

@@ -28,12 +28,16 @@ bin:
 .symbol_table: .lex .syntax
 	$(CPP) -c symbol_table.cpp -o $(BIN)/symbol_table.o
 	@ar -rc $(BIN)/libsymbol_table.a $(BIN)/symbol_table.o
-splc: bin .spl_node .spl_type .symbol_table
+.InterCode: .lex .syntax
+	$(CPP) -c InterCode.cpp -o $(BIN)/InterCode.o
+	@ar -rc $(BIN)/libInterCode.a $(BIN)/InterCode.o
+.translate: .lex .syntax
+	$(CPP) -c Translate.cpp -o $(BIN)/Translate.o
+	@ar -rc $(BIN)/libTranslate.a $(BIN)/Translate.o
+
+splc: bin .spl_node .spl_type .symbol_table .InterCode .translate
 	$(CPP) main.cpp -static -L$(BIN) -lsymbol_table -lspl_type -lspl_node -o $(BIN)/splc
 
 clean:
 	@rm -rf $(BIN)/
 	@rm -rf $(MAKE_PATH)/ lex.yy.c syntax.tab.* syntax.output
-
-# todo: Translate.cpp/hpp
-# todo: InterCode.cpp/hpp
