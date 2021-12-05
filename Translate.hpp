@@ -6,6 +6,10 @@
 #include <vector>
 using namespace std;
 
+string new_place();
+
+string new_label();
+
 vector<InterCode> translate_cond_Exp(Node *exp, string l1, string l2);
 
 
