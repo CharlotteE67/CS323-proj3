@@ -3,12 +3,13 @@
 #include <utility>
 
 using namespace std;
+
 #include <string>
 
 int cnt_place = 0, cnt_label = 0, cnt_var = 0;
 map<string, Operand *> var_table;
 
-vector<InterCode> translate_Exp(Node *exp, Operand *place) {
+vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
 
     vector<InterCode> ics;
     switch (exp->child.size()) {
@@ -32,7 +33,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *place) {
                 ics = translate_Exp(exp, tp);
                 ics.emplace_back(5, place, zero, tp);
             }
-                // todo: NOT EXP
+                // NOT EXP
             else if (exp->child[0]->get_name() == "NOT" && exp->child[1]->get_name() == "EXP") {
                 Operand *l1, *l2;
                 l1 = new_label();
@@ -49,30 +50,77 @@ vector<InterCode> translate_Exp(Node *exp, Operand *place) {
             }
             break;
         case 3:
-            // todo: 3: EXP ASSIGN EXP
+            // 3: EXP ASSIGN EXP
             if (exp->child[0]->get_name() == "EXP" && exp->child[1]->get_name() == "ASSIGN" &&
                 exp->child[2]->get_name() == "EXP") {
-
+                // todo: translate assignable
+                Operand *var = get_varOp(exp->child[0]->child[0]->get_name());
+                Operand *tp = new_place();
+                // code1
+                ics = translate_Exp(exp->child[2], tp);
+                // code2
+                ics.emplace_back(3, var, tp);
+                // code3
+//                ics.emplace_back(3, place, var);
+                place = var;
             }
-                // todo: 4: EXP PLUS EXP
+                // 4: EXP PLUS EXP
             else if (exp->child[0]->get_name() == "EXP" && exp->child[1]->get_name() == "PLUS" &&
                      exp->child[2]->get_name() == "EXP") {
-
+                Operand *t1, *t2;
+                t1 = new_place();
+                t2 = new_place();
+                // code1
+                ics = translate_Exp(exp->child[0], t1);
+                // code2
+                vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
+                // code3
+                ics.insert(ics.begin(), c2.begin(), c2.end());
+                ics.emplace_back(4, t1, t2);
             }
-                // todo: 5: EXP MINUS EXP
+                // 5: EXP MINUS EXP
             else if (exp->child[0]->get_name() == "EXP" && exp->child[1]->get_name() == "MINUS" &&
                      exp->child[2]->get_name() == "EXP") {
+                Operand *t1, *t2;
+                t1 = new_place();
+                t2 = new_place();
+                // code1
+                ics = translate_Exp(exp->child[0], t1);
+                // code2
+                vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
+                // code3
+                ics.insert(ics.begin(), c2.begin(), c2.end());
+                ics.emplace_back(5, t1, t2);
 
             }
-                // todo: 6: EXP MUL EXP
+                // 6: EXP MUL EXP
             else if (exp->child[0]->get_name() == "EXP" && exp->child[1]->get_name() == "MUL" &&
                      exp->child[2]->get_name() == "EXP") {
+                Operand *t1, *t2;
+                t1 = new_place();
+                t2 = new_place();
+                // code1
+                ics = translate_Exp(exp->child[0], t1);
+                // code2
+                vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
+                // code3
+                ics.insert(ics.begin(), c2.begin(), c2.end());
+                ics.emplace_back(6, t1, t2);
 
             }
-                // todo: 7: EXP DIV EXP
+                // 7: EXP DIV EXP
             else if (exp->child[0]->get_name() == "EXP" && exp->child[1]->get_name() == "DIV" &&
                      exp->child[2]->get_name() == "EXP") {
-
+                Operand *t1, *t2;
+                t1 = new_place();
+                t2 = new_place();
+                // code1
+                ics = translate_Exp(exp->child[0], t1);
+                // code2
+                vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
+                // code3
+                ics.insert(ics.begin(), c2.begin(), c2.end());
+                ics.emplace_back(7, t1, t2);
             }
 
                 // EXP cond. Exp
@@ -95,6 +143,25 @@ vector<InterCode> translate_Exp(Node *exp, Operand *place) {
                 ics.emplace_back(InterCode(1, l1));
                 ics.emplace_back(InterCode(3, place, new_immidiate(1)));
                 ics.emplace_back(InterCode(1, l2));
+            } else if (exp->child[0]->get_name() == "ID" && exp->child[1]->get_name() == "LP" &&
+                       exp->child[2]->get_name() == "RP") {
+                auto *func = new Operand(OpType::NAME, exp->child[0]->get_name());
+                ics.emplace_back(22, place, func);
+            }
+            break;
+        case 4:
+            if (exp->child[0]->get_name() == "ID" && exp->child[1]->get_name() == "LP" &&
+                exp->child[2]->get_name() == "Args" && exp->child[3]->get_name() == "RP") {
+                auto *func = new Operand(OpType::NAME, exp->child[0]->get_name());
+                vector<Operand *> arg_list;
+                // code1
+                ics = translate_Args(exp->child[2], arg_list);
+                // code2
+                for (int i = arg_list.size() - 1; i >= 0; --i) {
+                    ics.emplace_back(21, arg_list[i]);
+                }
+                // code3
+                ics.emplace_back(22, place, func);
             }
             break;
     }
@@ -103,18 +170,18 @@ vector<InterCode> translate_Exp(Node *exp, Operand *place) {
 
 
 vector<InterCode> translate_Stmt(Node *stmt) {
-    vector <InterCode> translate;
+    vector<InterCode> translate;
     // RETURN Exp SEMI
     if (stmt->child.size() == 3) {
-        Operand* tp = new_place();
+        Operand *tp = new_place();
         vector<InterCode> codes = translate_Exp(stmt->child[1], tp);
         translate.insert(translate.end(), codes.begin(), codes.end());
         translate.emplace_back(18, tp); // RETURN
     }
-    // IF LP Exp RP Stmt
-    else if (stmt->child.size() == 5 && stmt->child[0]->get_name() == "IF"){
-        Operand* lb1 = new_label();
-        Operand* lb2 = new_label();
+        // IF LP Exp RP Stmt
+    else if (stmt->child.size() == 5 && stmt->child[0]->get_name() == "IF") {
+        Operand *lb1 = new_label();
+        Operand *lb2 = new_label();
         vector<InterCode> code1 = translate_cond_Exp(stmt->child[2], lb1, lb2);
         vector<InterCode> code2 = translate_Stmt(stmt->child[4]);
         translate.insert(translate.end(), code1.begin(), code1.end());
@@ -122,11 +189,11 @@ vector<InterCode> translate_Stmt(Node *stmt) {
         translate.insert(translate.end(), code2.begin(), code2.end());
         translate.emplace_back(1, lb2);
     }
-    // IF LP Exp RP Stmt_1 ELSE Stmt_2
-    else if (stmt->child.size() == 7){
-        Operand* lb1 = new_label();
-        Operand* lb2 = new_label();
-        Operand* lb3 = new_label();
+        // IF LP Exp RP Stmt_1 ELSE Stmt_2
+    else if (stmt->child.size() == 7) {
+        Operand *lb1 = new_label();
+        Operand *lb2 = new_label();
+        Operand *lb3 = new_label();
         vector<InterCode> code1 = translate_cond_Exp(stmt->child[2], lb1, lb2);
         vector<InterCode> code2 = translate_Stmt(stmt->child[4]);
         vector<InterCode> code3 = translate_Stmt(stmt->child[6]);
@@ -138,11 +205,11 @@ vector<InterCode> translate_Stmt(Node *stmt) {
         translate.insert(translate.end(), code3.begin(), code3.end());
         translate.emplace_back(1, lb3);
     }
-    // WHILE LP Exp RP Stmt
-    else if (stmt->child.size() == 5){
-        Operand* lb1 = new_label();
-        Operand* lb2 = new_label();
-        Operand* lb3 = new_label();
+        // WHILE LP Exp RP Stmt
+    else if (stmt->child.size() == 5) {
+        Operand *lb1 = new_label();
+        Operand *lb2 = new_label();
+        Operand *lb3 = new_label();
         vector<InterCode> code1 = translate_cond_Exp(stmt->child[2], lb2, lb3);
         vector<InterCode> code2 = translate_Stmt(stmt->child[4]);
         translate.emplace_back(1, lb1);
@@ -152,29 +219,29 @@ vector<InterCode> translate_Stmt(Node *stmt) {
         translate.emplace_back(11, lb1);
         translate.emplace_back(1, lb3);
     }
-    // Exp SEMI
-    else if (stmt->child.size() == 2){
-        Operand* tp = new_place();
+        // Exp SEMI
+    else if (stmt->child.size() == 2) {
+        Operand *tp = new_place();
         vector<InterCode> codes = translate_Exp(stmt->child[0], tp);
         translate.insert(translate.end(), codes.begin(), codes.end());
     }
-    // CompSt
-    else if (stmt->child.size() == 1){ }
-    // FOR LP Def Exp SEMI Exp RP Stmt
-    else if (stmt->child.size() == 8) { }
-    // FOR LP Exp SEMI Exp SEMI Exp RP Stmt
-    else if (stmt->child.size() == 9){
+        // CompSt
+    else if (stmt->child.size() == 1) {}
+        // FOR LP Def Exp SEMI Exp RP Stmt
+    else if (stmt->child.size() == 8) {}
+        // FOR LP Exp SEMI Exp SEMI Exp RP Stmt
+    else if (stmt->child.size() == 9) {
         // Exp_1
-        Operand* tp1 = new_place();
+        Operand *tp1 = new_place();
         vector<InterCode> exp1 = translate_Exp(stmt->child[0], tp1);
         translate.insert(translate.end(), exp1.begin(), exp1.end());
         // WHILE Exp_2 Stmt + Exp_3
-        Operand* lb1 = new_label();
-        Operand* lb2 = new_label();
-        Operand* lb3 = new_label();
+        Operand *lb1 = new_label();
+        Operand *lb2 = new_label();
+        Operand *lb3 = new_label();
         vector<InterCode> exp2 = translate_cond_Exp(stmt->child[4], lb2, lb3);
         vector<InterCode> code1 = translate_Stmt(stmt->child[8]);
-        Operand* tp2 = new_place();
+        Operand *tp2 = new_place();
         vector<InterCode> code2 = translate_Exp(stmt->child[6], tp2);
         translate.emplace_back(1, lb1);
         translate.insert(translate.end(), exp2.begin(), exp2.end());
@@ -189,56 +256,56 @@ vector<InterCode> translate_Stmt(Node *stmt) {
 }
 
 
-vector<InterCode> translate_cond_Exp(Node *exp, Operand* lt, Operand* lf){
-    if(exp->child.size()==2){
+vector<InterCode> translate_cond_Exp(Node *exp, Operand *lt, Operand *lf) {
+    if (exp->child.size() == 2) {
         //NOT EXP
-        return translate_cond_Exp(exp->child[1],lf,lt);
-    }else if(exp->child[1]->get_name()=="EQ"){
+        return translate_cond_Exp(exp->child[1], lf, lt);
+    } else if (exp->child[1]->get_name() == "EQ") {
         //EXP EQ EXP
-        Operand* t1 = new_place();
-        Operand* t2 = new_place();
-        vector<InterCode> code1 = translate_Exp(exp->child[0],t1);
-        vector<InterCode> code2 = translate_Exp(exp->child[2],t2);
-        code1.insert(code1.end(),code2.begin(),code2.end());
+        Operand *t1 = new_place();
+        Operand *t2 = new_place();
+        vector<InterCode> code1 = translate_Exp(exp->child[0], t1);
+        vector<InterCode> code2 = translate_Exp(exp->child[2], t2);
+        code1.insert(code1.end(), code2.begin(), code2.end());
         //IF == GOTO
-        code1.emplace_back(InterCode(17,t1,t2,lt));
+        code1.emplace_back(17, t1, t2, lt);
         //GOTO LBF
-        code1.emplace_back(InterCode(11,lf));
+        code1.emplace_back(11, lf);
         return code1;
 
-    }else if(exp->child[1]->get_name()=="AND"){
-        Operand* lb1 = new_label();
-        vector<InterCode> code1 = translate_cond_Exp(exp->child[0],lb1,lf);
+    } else if (exp->child[1]->get_name() == "AND") {
+        Operand *lb1 = new_label();
+        vector<InterCode> code1 = translate_cond_Exp(exp->child[0], lb1, lf);
         //+label bl1
-        code1.emplace_back(InterCode(1,lb1));
-        vector<InterCode> code2 = translate_cond_Exp(exp->child[2],lt,lf);
-        code1.insert(code1.end(),code2.begin(),code2.end());
+        code1.emplace_back(InterCode(1, lb1));
+        vector<InterCode> code2 = translate_cond_Exp(exp->child[2], lt, lf);
+        code1.insert(code1.end(), code2.begin(), code2.end());
         return code1;
-    }else if(exp->child[1]->get_name()=="OR"){
-        Operand* lb1 = new_label();
-        vector<InterCode> code1 = translate_cond_Exp(exp->child[0],lt,lb1);
-        vector<InterCode> code2 = translate_cond_Exp(exp->child[2],lt,lf);
-        code1.emplace_back(InterCode(1,lb1));
-        code1.insert(code1.end(),code2.begin(),code2.end());
+    } else if (exp->child[1]->get_name() == "OR") {
+        Operand *lb1 = new_label();
+        vector<InterCode> code1 = translate_cond_Exp(exp->child[0], lt, lb1);
+        vector<InterCode> code2 = translate_cond_Exp(exp->child[2], lt, lf);
+        code1.emplace_back(InterCode(1, lb1));
+        code1.insert(code1.end(), code2.begin(), code2.end());
         return code1;
     }
 }
 
 
-vector<InterCode> translate_Args(Node *args,vector<Operand *>argList){
-    if(args->child.size()==1){
-        //EXP   
+vector<InterCode> translate_Args(Node *args, vector<Operand *> &argList) {
+    if (args->child.size() == 1) {
+        //EXP
         Operand *tp = new_place();
-        vector<InterCode> code = translate_Exp(args->child[0],tp);
+        vector<InterCode> code = translate_Exp(args->child[0], tp);
         argList.push_back(tp);
         return code;
-    }else{
+    } else {
         //EXP COMMA ARGS
         Operand *tp = new_place();
-        vector<InterCode> code1 = translate_Exp(args->child[0],tp);
+        vector<InterCode> code1 = translate_Exp(args->child[0], tp);
         argList.push_back(tp);
-        vector<InterCode> code2 = translate_Args(args->child[2],argList);
-        code1.insert(code1.end(),code2.begin(),code2.end());
+        vector<InterCode> code2 = translate_Args(args->child[2], argList);
+        code1.insert(code1.end(), code2.begin(), code2.end());
         return code1;
     }
 }
