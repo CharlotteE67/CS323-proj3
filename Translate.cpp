@@ -78,13 +78,25 @@ vector<InterCode> translate_Stmt(Node *stmt) {
     else if (stmt->child.size() == 8) { }
     // FOR LP Exp SEMI Exp SEMI Exp RP Stmt
     else if (stmt->child.size() == 9){
+        // Exp_1
         string tp1 = new_place();
-        string tp2 = new_place();
+        vector<InterCode> exp1 = translate_Exp(stmt->child[0], tp1);
+        translate.insert(translate.end(), exp1.begin(), exp1.end());
+        // WHILE Exp_2 Stmt + Exp_3
         string lb1 = new_label();
         string lb2 = new_label();
-        vector<InterCode> code1 = translate_Exp(stmt->child[2], tp1);
-        vector<InterCode> code2 = translate_cond_Exp(stmt->child[4], lb1, lb2);
-        vector<InterCode> code3 = translate_Exp(stmt->child[5], tp2);
+        string lb3 = new_label();
+        vector<InterCode> exp2 = translate_cond_Exp(stmt->child[4], lb2, lb3);
+        vector<InterCode> code1 = translate_Stmt(stmt->child[8]);
+        string tp2 = new_place();
+        vector<InterCode> code2 = translate_Exp(stmt->child[6], tp2);
+        translate.push_back(InterCode(1, lb1));
+        translate.insert(translate.end(), exp2.begin(), exp2.end());
+        translate.push_back(InterCode(1, lb2));
+        translate.insert(translate.end(), code1.begin(), code1.end());
+        translate.insert(translate.end(), code2.begin(), code2.end());
+        translate.push_back(InterCode(11, lb1));
+        translate.push_back(InterCode(1, lb3));
     }
 
     return translate;
