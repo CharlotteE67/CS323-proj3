@@ -1,7 +1,29 @@
 #ifndef CS323_PROJ3_INTERCODE_HPP
 #define CS323_PROJ3_INTERCODE_HPP
+
 #include <string>
+
 using namespace std;
+
+enum class OpType {
+    PLACE,
+    LABEL,
+    VAR,
+    IMMIDIATE,
+    NAME
+};
+
+class Operand {
+public:
+    OpType type;
+    string name;
+
+    Operand(OpType type);
+
+    Operand(OpType type, string name);
+
+    string get_name();
+};
 
 enum class InterCodeType {
     LABEL,
@@ -15,13 +37,13 @@ enum class InterCodeType {
 class InterCode {
 public:
     int interCodeType{}; // todo: change to enum
-    string x;
-    string y;
-    string z;
+    Operand *x{};
+    Operand *y{};
+    Operand *z{};
 
     InterCode();
 
-    InterCode(int type, string x = "", string y = "", string z = "");
+    InterCode(int type, Operand *x = nullptr, Operand *y = nullptr, Operand *z = nullptr);
 };
 
 

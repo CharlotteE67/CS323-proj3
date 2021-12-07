@@ -6,13 +6,17 @@
 #include <vector>
 using namespace std;
 
-string new_place();
+Operand* new_place();
 
-string new_label();
+Operand* new_label();
 
-vector<InterCode> translate_cond_Exp(Node *exp, string lt, string lf);
+Operand* new_immidiate(int i);
 
-vector<InterCode> translate_Exp(Node *exp,string t);
+Operand* get_varOp(string var);
+
+vector<InterCode> translate_cond_Exp(Node *exp, Operand* l1, Operand* l2);
+
+vector<InterCode> translate_Exp(Node *exp, Operand* place);
 
 vector<InterCode> translate_Stmt(Node *stmt);
 
