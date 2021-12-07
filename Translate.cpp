@@ -201,9 +201,9 @@ vector<InterCode> translate_cond_Exp(Node *exp, Operand* lt, Operand* lf){
         vector<InterCode> code2 = translate_Exp(exp->child[2],t2);
         code1.insert(code1.end(),code2.begin(),code2.end());
         //IF == GOTO
-        code1.emplace_back(17,t1,t2,lt);
+        code1.emplace_back(InterCode(17,t1,t2,lt));
         //GOTO LBF
-        code1.emplace_back(11,lf);
+        code1.emplace_back(InterCode(11,lf));
         return code1;
 
     }else if(exp->child[1]->get_name()=="AND"){
@@ -219,6 +219,25 @@ vector<InterCode> translate_cond_Exp(Node *exp, Operand* lt, Operand* lf){
         vector<InterCode> code1 = translate_cond_Exp(exp->child[0],lt,lb1);
         vector<InterCode> code2 = translate_cond_Exp(exp->child[2],lt,lf);
         code1.emplace_back(InterCode(1,lb1));
+        code1.insert(code1.end(),code2.begin(),code2.end());
+        return code1;
+    }
+}
+
+
+vector<InterCode> translate_Args(Node *args,vector<Operand *>argList){
+    if(args->child.size()==1){
+        //EXP   
+        Operand *tp = new_place();
+        vector<InterCode> code = translate_Exp(args->child[0],tp);
+        argList.push_back(tp);
+        return code;
+    }else{
+        //EXP COMMA ARGS
+        Operand *tp = new_place();
+        vector<InterCode> code1 = translate_Exp(args->child[0],tp);
+        argList.push_back(tp);
+        vector<InterCode> code2 = translate_Args(args->child[2],argList);
         code1.insert(code1.end(),code2.begin(),code2.end());
         return code1;
     }
