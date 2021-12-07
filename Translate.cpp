@@ -143,25 +143,40 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 ics.emplace_back(InterCode(1, l1));
                 ics.emplace_back(InterCode(3, place, new_immidiate(1)));
                 ics.emplace_back(InterCode(1, l2));
-            } else if (exp->child[0]->get_name() == "ID" && exp->child[1]->get_name() == "LP" &&
-                       exp->child[2]->get_name() == "RP") {
-                auto *func = new Operand(OpType::NAME, exp->child[0]->get_name());
-                ics.emplace_back(22, place, func);
+            }
+                // ID LP RP
+            else if (exp->child[0]->get_name() == "ID" && exp->child[1]->get_name() == "LP" &&
+                     exp->child[2]->get_name() == "RP") {
+                string func_name = exp->child[0]->get_name();
+                if (func_name == "read") {
+                    ics.emplace_back(23, place);
+                } else {
+                    auto *func = new Operand(OpType::NAME, func_name);
+                    ics.emplace_back(22, place, func);
+                }
             }
             break;
         case 4:
+            // ID LP Args RP
             if (exp->child[0]->get_name() == "ID" && exp->child[1]->get_name() == "LP" &&
                 exp->child[2]->get_name() == "Args" && exp->child[3]->get_name() == "RP") {
-                auto *func = new Operand(OpType::NAME, exp->child[0]->get_name());
-                vector<Operand *> arg_list;
-                // code1
-                ics = translate_Args(exp->child[2], arg_list);
-                // code2
-                for (int i = arg_list.size() - 1; i >= 0; --i) {
-                    ics.emplace_back(21, arg_list[i]);
+                string func_name = exp->child[0]->get_name();
+                if (func_name == "write") {
+                    Operand *tp = new_place();
+                    ics = translate_Exp(exp->child[2], tp);
+                    ics.emplace_back(24, place, tp);
+                } else {
+                    auto *func = new Operand(OpType::NAME, func_name);
+                    vector<Operand *> arg_list;
+                    // code1
+                    ics = translate_Args(exp->child[2], arg_list);
+                    // code2
+                    for (int i = arg_list.size() - 1; i >= 0; --i) {
+                        ics.emplace_back(21, arg_list[i]);
+                    }
+                    // code3
+                    ics.emplace_back(22, place, func);
                 }
-                // code3
-                ics.emplace_back(22, place, func);
             }
             break;
     }
@@ -328,5 +343,6 @@ Operand *get_varOp(string var) {
 Operand *new_immidiate(int i) {
     return new Operand(OpType::IMMIDIATE, to_string(i));
 }
+
 
 

@@ -12,6 +12,10 @@
 
 using namespace std;
 
+Type* get_read();
+
+Type* get_write();
+
 FieldList* defVisit(Node *def,Type *outlayer);
 
 void structDec(Node *ssp);

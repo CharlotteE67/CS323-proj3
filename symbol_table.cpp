@@ -1,8 +1,24 @@
 #include "symbol_table.hpp"
 
-map<string, Type *> symbolTable;
+map<string, Type *> symbolTable{
+    make_pair("read", get_read()),
+    make_pair("write", get_write())
+};
 static map<string, Type *> strToType = {};
 static map<Type *, string> typeToStr = {};
+
+
+Type *get_read() {
+    Type *read = new Type("read", CATEGORY::FUNCTION);
+    read->set_fieldList(new FieldList());
+    return read;
+}
+
+Type *get_write() {
+    Type *write = new Type("write", CATEGORY::FUNCTION);
+    write->set_fieldList(new FieldList("i", new Type("i", "INT"), nullptr));
+    return write;
+}
 
 /* def -> specifier -> type */
 string defGetTypeName(Node *def) {
