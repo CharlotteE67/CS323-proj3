@@ -26,17 +26,33 @@ public:
 };
 
 enum class InterCodeType {
-    LABEL,
+    LABEL=1,
     FUNCTION,
     ASSIGN,
     ADD, SUB, MUL, DIV,
     // 8 ~ 21
-    READ, WRITE
+    ADDR,
+    PTR,
+    COPY,
+    GOTO,
+    IF_S,
+    IF_SE,
+    IF_B,
+    IF_BE,
+    IF_NE,
+    IF_EQ,
+    RETURN,
+    DEC,
+    PARAM,
+    ARG,
+    CALL,
+    READ, 
+    WRITE
 };
 
 class InterCode {
 public:
-    int interCodeType{}; // todo: change to enum
+    InterCodeType interCodeType; // todo: change to enum
     Operand *x{};
     Operand *y{};
     Operand *z{};
@@ -44,6 +60,8 @@ public:
     InterCode();
 
     InterCode(int type, Operand *x = nullptr, Operand *y = nullptr, Operand *z = nullptr);
+
+    void print();
 };
 
 
