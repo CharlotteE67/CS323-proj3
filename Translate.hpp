@@ -23,4 +23,14 @@ vector<InterCode> translate_Stmt(Node *stmt);
 
 vector<InterCode> translate_Args(Node *args, vector<Operand *> &argList);
 
+vector<InterCode> translate_FunDec(Node *funDec);
+
+void merge_CompSt(Node *compSt);
+
+void merge_DefList(Node *defList);
+
+void merge_StmtList(Node *stmtList);
+
+vector<InterCode> translate_Def(Node *Def);
+
 #endif //CS323_PROJ3_TRANSLATE_HPP

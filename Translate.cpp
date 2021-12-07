@@ -1,10 +1,12 @@
 #include "Translate.hpp"
 #include <map>
 #include <utility>
+#include <string>
+#include <deque>
+#include "symbol_table.hpp"
 
 using namespace std;
-
-#include <string>
+extern map<string, Type *> symbolTable;
 
 int cnt_place = 0, cnt_label = 0, cnt_var = 0;
 map<string, Operand *> var_table;
@@ -451,6 +453,22 @@ Operand *get_varOp(string var) {
 
 Operand *new_immidiate(int i) {
     return new Operand(OpType::IMMIDIATE, to_string(i));
+}
+
+vector<InterCode> translate_FunDec(Node *funDec) {
+    vector<InterCode> ics;
+    string func_name = funDec->child[0]->get_name();
+    ics.emplace_back(2, new Operand(OpType::NAME, func_name));
+    if(funDec->child.size() == 4) {
+        FieldList *fieldList = symbolTable[func_name]->get_fieldList();
+        Operand *var = get_varOp(fieldList->name);
+        ics.emplace_back(20, var);
+    }
+    return ics;
+}
+
+vector<InterCode> translate_Def(Node *Def) {
+    return vector<InterCode>();
 }
 
 
