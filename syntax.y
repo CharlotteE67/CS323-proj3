@@ -2,6 +2,7 @@
     #include "lex.yy.c"
     #include "spl_type.hpp"
     #include "symbol_table.hpp"
+    #include "Translate.hpp"
 
     void yyerror(const char *s);
     void lineinfor(void);
@@ -72,6 +73,8 @@ ExtDef:
         vector<Node*> vec = {$1, $2, $3};
         $$ = new Node("ExtDef", @$.first_line, vec);
         funcDec($$);
+        auto ics = merge_ExtDef($$);
+        print_codes(ics);
         }
     | Specifier ExtDecList error  {puts(ERR_NO_SEMI.c_str());}
     | Specifier error {puts(ERR_NO_SEMI.c_str());}

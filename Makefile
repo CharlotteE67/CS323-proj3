@@ -36,7 +36,7 @@ bin:
 	@ar -rc $(BIN)/libTranslate.a $(BIN)/Translate.o
 
 splc: bin .spl_node .spl_type .symbol_table .InterCode .translate
-	$(CPP) main.cpp -static -L$(BIN) -lsymbol_table -lspl_type -lspl_node -o $(BIN)/splc
+	$(CPP) main.cpp -static -L$(BIN) -lsymbol_table -lspl_type -lspl_node -lTranslate -lInterCode -o $(BIN)/splc
 
 clean:
 	@rm -rf $(BIN)/

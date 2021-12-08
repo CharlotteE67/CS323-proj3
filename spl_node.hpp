@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include "spl_type.hpp"
+#include "InterCode.hpp"
 
 using namespace std;
 
@@ -35,6 +36,7 @@ private:
 
 public:
     vector <Node*> child;
+    vector <InterCode*> codes;
     bool assignable = false;
     Node();
 

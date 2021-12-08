@@ -10,7 +10,8 @@ static map<Type *, string> typeToStr = {};
 
 Type *get_read() {
     Type *read = new Type("read", CATEGORY::FUNCTION);
-    read->set_fieldList(new FieldList());
+    read->set_fieldList(nullptr);
+    read->typePointer = new Type("i", "INT");
     return read;
 }
 

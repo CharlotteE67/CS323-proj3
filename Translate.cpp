@@ -28,15 +28,15 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
             }
             break;
         case 2:
-            // MINUS EXP
-            if (exp->child[0]->get_name() == "MINUS" && exp->child[1]->get_name() == "EXP") {
+            // MINUS Exp
+            if (exp->child[0]->get_name() == "MINUS" && exp->child[1]->get_name() == "Exp") {
                 Operand *tp = new_place();
                 Operand *zero = new_immidiate(0);
                 ics = translate_Exp(exp, tp);
                 ics.emplace_back(5, place, zero, tp);
             }
-                // NOT EXP
-            else if (exp->child[0]->get_name() == "NOT" && exp->child[1]->get_name() == "EXP") {
+                // NOT Exp
+            else if (exp->child[0]->get_name() == "NOT" && exp->child[1]->get_name() == "Exp") {
                 Operand *l1, *l2;
                 l1 = new_label();
                 l2 = new_label();
@@ -52,9 +52,9 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
             }
             break;
         case 3:
-            // 3: EXP ASSIGN EXP
-            if (exp->child[0]->get_name() == "EXP" && exp->child[1]->get_name() == "ASSIGN" &&
-                exp->child[2]->get_name() == "EXP") {
+            // 3: Exp ASSIGN Exp
+            if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "ASSIGN" &&
+                exp->child[2]->get_name() == "Exp") {
                 // todo: translate assignable
                 Operand *var = get_varOp(exp->child[0]->child[0]->get_name());
                 Operand *tp = new_place();
@@ -66,9 +66,9 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
 //                ics.emplace_back(3, place, var);
                 place = var;
             }
-                // 4: EXP PLUS EXP
-            else if (exp->child[0]->get_name() == "EXP" && exp->child[1]->get_name() == "PLUS" &&
-                     exp->child[2]->get_name() == "EXP") {
+                // 4: Exp PLUS Exp
+            else if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "PLUS" &&
+                     exp->child[2]->get_name() == "Exp") {
                 Operand *t1, *t2;
                 t1 = new_place();
                 t2 = new_place();
@@ -76,13 +76,13 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 ics = translate_Exp(exp->child[0], t1);
                 // code2
                 vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
+                ics.insert(ics.end(), c2.begin(), c2.end());
                 // code3
-                ics.insert(ics.begin(), c2.begin(), c2.end());
                 ics.emplace_back(4, t1, t2);
             }
-                // 5: EXP MINUS EXP
-            else if (exp->child[0]->get_name() == "EXP" && exp->child[1]->get_name() == "MINUS" &&
-                     exp->child[2]->get_name() == "EXP") {
+                // 5: Exp MINUS Exp
+            else if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "MINUS" &&
+                     exp->child[2]->get_name() == "Exp") {
                 Operand *t1, *t2;
                 t1 = new_place();
                 t2 = new_place();
@@ -91,13 +91,13 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 // code2
                 vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
                 // code3
-                ics.insert(ics.begin(), c2.begin(), c2.end());
+                ics.insert(ics.end(), c2.begin(), c2.end());
                 ics.emplace_back(5, t1, t2);
 
             }
-                // 6: EXP MUL EXP
-            else if (exp->child[0]->get_name() == "EXP" && exp->child[1]->get_name() == "MUL" &&
-                     exp->child[2]->get_name() == "EXP") {
+                // 6: Exp MUL Exp
+            else if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "MUL" &&
+                     exp->child[2]->get_name() == "Exp") {
                 Operand *t1, *t2;
                 t1 = new_place();
                 t2 = new_place();
@@ -106,13 +106,13 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 // code2
                 vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
                 // code3
-                ics.insert(ics.begin(), c2.begin(), c2.end());
+                ics.insert(ics.end(), c2.begin(), c2.end());
                 ics.emplace_back(6, t1, t2);
 
             }
-                // 7: EXP DIV EXP
-            else if (exp->child[0]->get_name() == "EXP" && exp->child[1]->get_name() == "DIV" &&
-                     exp->child[2]->get_name() == "EXP") {
+                // 7: Exp DIV Exp
+            else if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "DIV" &&
+                     exp->child[2]->get_name() == "Exp") {
                 Operand *t1, *t2;
                 t1 = new_place();
                 t2 = new_place();
@@ -121,18 +121,18 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 // code2
                 vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
                 // code3
-                ics.insert(ics.begin(), c2.begin(), c2.end());
+                ics.insert(ics.end(), c2.begin(), c2.end());
                 ics.emplace_back(7, t1, t2);
             }
 
-                // EXP cond. Exp
-            else if (exp->child[0]->get_name() == "EXP"
+                // Exp cond. Exp
+            else if (exp->child[0]->get_name() == "Exp"
                      && (exp->child[1]->get_name() == "LT" || exp->child[1]->get_name() == "LE" ||
                          exp->child[1]->get_name() == "GT" || exp->child[1]->get_name() == "GE" ||
                          exp->child[1]->get_name() == "NE" || exp->child[1]->get_name() == "EQ" ||
                          exp->child[1]->get_name() == "AND" || exp->child[1]->get_name() == "OR"
                      )
-                     && exp->child[2]->get_name() == "EXP") {
+                     && exp->child[2]->get_name() == "Exp") {
                 Operand *l1, *l2;
                 l1 = new_label();
                 l2 = new_label();
@@ -147,7 +147,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 ics.emplace_back(InterCode(1, l2));
             }
                 // ID LP RP
-            else if (exp->child[0]->get_name() == "ID" && exp->child[1]->get_name() == "LP" &&
+            else if (exp->child[0]->get_type() == Node_TYPE::ID && exp->child[1]->get_name() == "LP" &&
                      exp->child[2]->get_name() == "RP") {
                 string func_name = exp->child[0]->get_name();
                 if (func_name == "read") {
@@ -160,7 +160,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
             break;
         case 4:
             // ID LP Args RP
-            if (exp->child[0]->get_name() == "ID" && exp->child[1]->get_name() == "LP" &&
+            if (exp->child[0]->get_type() == Node_TYPE::ID && exp->child[1]->get_name() == "LP" &&
                 exp->child[2]->get_name() == "Args" && exp->child[3]->get_name() == "RP") {
                 string func_name = exp->child[0]->get_name();
                 if (func_name == "write") {
@@ -254,46 +254,46 @@ vector<InterCode> translate_Stmt(Node *stmt) {
                                 VarDec -> ID(INT)
                 StmtList -> null | Stmt StmtList
         */
-    else if (stmt->child.size() == 1){
+    else if (stmt->child.size() == 1) {
         // DefList
-        Node* further_def = stmt->child[0]->child[1]; // DefList
-        while (further_def->child.size() != 0){
-            Node* further_dec = further_def->child[0]->child[1]; // DecList
-            while (further_dec->child.size() == 3){
-                if (further_dec->child[0]->child.size() == 1){ // VarDec
-                    Operand* op = get_varOp(further_dec->child[0]->child[0]->child[0]->child[0]->get_name());
-                }else{ // VarDec ASSIGN Exp
+        Node *further_def = stmt->child[0]->child[1]; // DefList
+        while (further_def->child.size() != 0) {
+            Node *further_dec = further_def->child[0]->child[1]; // DecList
+            while (further_dec->child.size() == 3) {
+                if (further_dec->child[0]->child.size() == 1) { // VarDec
+                    Operand *op = get_varOp(further_dec->child[0]->child[0]->child[0]->child[0]->get_name());
+                } else { // VarDec ASSIGN Exp
                     // construct Exp -> Exp ASSIGN Exp
-                    Node* id = further_dec->child[0]->child[0]->child[0];
-                    Node* construct = new Node("Exp", id->get_lineNo());
-                    vector<Node*> child = {id};
-                    Node* exp_1 = new Node("Exp", id->get_lineNo(), child);
-                    vector<Node*> childs = {exp_1, new Node("ASSIGN"), further_dec->child[0]->child[2]};
+                    Node *id = further_dec->child[0]->child[0]->child[0];
+                    Node *construct = new Node("Exp", id->get_lineNo());
+                    vector<Node *> child = {id};
+                    Node *exp_1 = new Node("Exp", id->get_lineNo(), child);
+                    vector<Node *> childs = {exp_1, new Node("ASSIGN"), further_dec->child[0]->child[2]};
                     construct->set_child(childs);
-                    Operand* tp = new_place();
+                    Operand *tp = new_place();
                     vector<InterCode> assigns = translate_Exp(construct, tp);
                     translate.insert(translate.end(), assigns.begin(), assigns.end());
                 }
                 further_dec = further_dec->child[2];
             }
-            if (further_dec->child[0]->child.size() == 1){ // VarDec
-                Operand* op = get_varOp(further_dec->child[0]->child[0]->child[0]->child[0]->get_name());
-            }else{ // VarDec ASSIGN Exp
+            if (further_dec->child[0]->child.size() == 1) { // VarDec
+                Operand *op = get_varOp(further_dec->child[0]->child[0]->child[0]->child[0]->get_name());
+            } else { // VarDec ASSIGN Exp
                 // construct Exp -> Exp ASSIGN Exp
-                Node* id = further_dec->child[0]->child[0]->child[0];
-                Node* construct = new Node("Exp", id->get_lineNo());
-                vector<Node*> child = {id};
-                Node* exp_1 = new Node("Exp", id->get_lineNo(), child);
-                vector<Node*> childs = {exp_1, new Node("ASSIGN"), further_dec->child[0]->child[2]};
+                Node *id = further_dec->child[0]->child[0]->child[0];
+                Node *construct = new Node("Exp", id->get_lineNo());
+                vector<Node *> child = {id};
+                Node *exp_1 = new Node("Exp", id->get_lineNo(), child);
+                vector<Node *> childs = {exp_1, new Node("ASSIGN"), further_dec->child[0]->child[2]};
                 construct->set_child(childs);
-                Operand* tp = new_place();
+                Operand *tp = new_place();
                 vector<InterCode> assigns = translate_Exp(construct, tp);
                 translate.insert(translate.end(), assigns.begin(), assigns.end());
             }
         }
         // StmtList
-        Node* further_stmt = stmt->child[0]->child[2];
-        while (further_stmt->child.size() != 0){
+        Node *further_stmt = stmt->child[0]->child[2];
+        while (further_stmt->child.size() != 0) {
             vector<InterCode> further_codes = translate_Stmt(further_stmt->child[0]);
             translate.insert(translate.end(), further_codes.begin(), further_codes.end());
             further_stmt = further_stmt->child[1];
@@ -307,45 +307,45 @@ vector<InterCode> translate_Stmt(Node *stmt) {
             DecList -> Dec | Dec COMMA DecList
                 Dec -> VarDec | VarDec ASSIGN Exp
                     VarDec -> ID(INT) */
-        Node* decList = stmt->child[2]->child[1];
-        while (decList->child.size() == 3){
-            if (decList->child[0]->child.size() == 1){ // VarDec
-                Operand* op = get_varOp(decList->child[0]->child[0]->child[0]->child[0]->get_name());
-            }else{ // VarDec ASSIGN Exp
+        Node *decList = stmt->child[2]->child[1];
+        while (decList->child.size() == 3) {
+            if (decList->child[0]->child.size() == 1) { // VarDec
+                Operand *op = get_varOp(decList->child[0]->child[0]->child[0]->child[0]->get_name());
+            } else { // VarDec ASSIGN Exp
                 // construct Exp -> Exp ASSIGN Exp
-                Node* id = decList->child[0]->child[0]->child[0];
-                Node* construct = new Node("Exp", id->get_lineNo());
-                vector<Node*> child = {id};
-                Node* exp_1 = new Node("Exp", id->get_lineNo(), child);
-                vector<Node*> childs = {exp_1, new Node("ASSIGN"), decList->child[0]->child[2]};
+                Node *id = decList->child[0]->child[0]->child[0];
+                Node *construct = new Node("Exp", id->get_lineNo());
+                vector<Node *> child = {id};
+                Node *exp_1 = new Node("Exp", id->get_lineNo(), child);
+                vector<Node *> childs = {exp_1, new Node("ASSIGN"), decList->child[0]->child[2]};
                 construct->set_child(childs);
-                Operand* tp = new_place();
+                Operand *tp = new_place();
                 vector<InterCode> assigns = translate_Exp(construct, tp);
                 translate.insert(translate.end(), assigns.begin(), assigns.end());
             }
             decList = decList->child[2];
         }
-        if (decList->child[0]->child.size() == 1){ // VarDec
-            Operand* op = get_varOp(decList->child[0]->child[0]->child[0]->child[0]->get_name());
-        }else{ // VarDec ASSIGN Exp
+        if (decList->child[0]->child.size() == 1) { // VarDec
+            Operand *op = get_varOp(decList->child[0]->child[0]->child[0]->child[0]->get_name());
+        } else { // VarDec ASSIGN Exp
             // construct Exp -> Exp ASSIGN Exp
-            Node* id = decList->child[0]->child[0]->child[0];
-            Node* construct = new Node("Exp", id->get_lineNo());
-            vector<Node*> child = {id};
-            Node* exp_1 = new Node("Exp", id->get_lineNo(), child);
-            vector<Node*> childs = {exp_1, new Node("ASSIGN"), decList->child[0]->child[2]};
+            Node *id = decList->child[0]->child[0]->child[0];
+            Node *construct = new Node("Exp", id->get_lineNo());
+            vector<Node *> child = {id};
+            Node *exp_1 = new Node("Exp", id->get_lineNo(), child);
+            vector<Node *> childs = {exp_1, new Node("ASSIGN"), decList->child[0]->child[2]};
             construct->set_child(childs);
-            Operand* tp = new_place();
+            Operand *tp = new_place();
             vector<InterCode> assigns = translate_Exp(construct, tp);
             translate.insert(translate.end(), assigns.begin(), assigns.end());
         }
         // WHILE Exp_2 Stmt + Exp_3
-        Operand* lb1 = new_label();
-        Operand* lb2 = new_label();
-        Operand* lb3 = new_label();
+        Operand *lb1 = new_label();
+        Operand *lb2 = new_label();
+        Operand *lb3 = new_label();
         vector<InterCode> exp2 = translate_cond_Exp(stmt->child[4], lb2, lb3);
         vector<InterCode> code1 = translate_Stmt(stmt->child[8]);
-        Operand* tp2 = new_place();
+        Operand *tp2 = new_place();
         vector<InterCode> code2 = translate_Exp(stmt->child[6], tp2);
         translate.emplace_back(1, lb1);
         translate.insert(translate.end(), exp2.begin(), exp2.end());
@@ -384,10 +384,75 @@ vector<InterCode> translate_Stmt(Node *stmt) {
 
 vector<InterCode> translate_cond_Exp(Node *exp, Operand *lt, Operand *lf) {
     if (exp->child.size() == 2) {
-        //NOT EXP
+        //NOT Exp
         return translate_cond_Exp(exp->child[1], lf, lt);
+    } else if (exp->child[1]->get_name() == "LT") {
+        //Exp LT Exp
+        Operand *t1 = new_place();
+        Operand *t2 = new_place();
+        vector<InterCode> code1 = translate_Exp(exp->child[0], t1);
+        vector<InterCode> code2 = translate_Exp(exp->child[2], t2);
+        code1.insert(code1.end(), code2.begin(), code2.end());
+        //IF == GOTO
+        code1.emplace_back(12, t1, t2, lt);
+        //GOTO LBF
+        code1.emplace_back(11, lf);
+        return code1;
+
+    } else if (exp->child[1]->get_name() == "LE") {
+        //Exp LE Exp
+        Operand *t1 = new_place();
+        Operand *t2 = new_place();
+        vector<InterCode> code1 = translate_Exp(exp->child[0], t1);
+        vector<InterCode> code2 = translate_Exp(exp->child[2], t2);
+        code1.insert(code1.end(), code2.begin(), code2.end());
+        //IF == GOTO
+        code1.emplace_back(13, t1, t2, lt);
+        //GOTO LBF
+        code1.emplace_back(11, lf);
+        return code1;
+
+    } else if (exp->child[1]->get_name() == "GT") {
+        //Exp GT Exp
+        Operand *t1 = new_place();
+        Operand *t2 = new_place();
+        vector<InterCode> code1 = translate_Exp(exp->child[0], t1);
+        vector<InterCode> code2 = translate_Exp(exp->child[2], t2);
+        code1.insert(code1.end(), code2.begin(), code2.end());
+        //IF == GOTO
+        code1.emplace_back(14, t1, t2, lt);
+        //GOTO LBF
+        code1.emplace_back(11, lf);
+        return code1;
+
+    } else if (exp->child[1]->get_name() == "GE") {
+        //Exp GE Exp
+        Operand *t1 = new_place();
+        Operand *t2 = new_place();
+        vector<InterCode> code1 = translate_Exp(exp->child[0], t1);
+        vector<InterCode> code2 = translate_Exp(exp->child[2], t2);
+        code1.insert(code1.end(), code2.begin(), code2.end());
+        //IF == GOTO
+        code1.emplace_back(15, t1, t2, lt);
+        //GOTO LBF
+        code1.emplace_back(11, lf);
+        return code1;
+
+    } else if (exp->child[1]->get_name() == "NE") {
+        //Exp NE Exp
+        Operand *t1 = new_place();
+        Operand *t2 = new_place();
+        vector<InterCode> code1 = translate_Exp(exp->child[0], t1);
+        vector<InterCode> code2 = translate_Exp(exp->child[2], t2);
+        code1.insert(code1.end(), code2.begin(), code2.end());
+        //IF == GOTO
+        code1.emplace_back(16, t1, t2, lt);
+        //GOTO LBF
+        code1.emplace_back(11, lf);
+        return code1;
+
     } else if (exp->child[1]->get_name() == "EQ") {
-        //EXP EQ EXP
+        //Exp EQ Exp
         Operand *t1 = new_place();
         Operand *t2 = new_place();
         vector<InterCode> code1 = translate_Exp(exp->child[0], t1);
@@ -420,13 +485,13 @@ vector<InterCode> translate_cond_Exp(Node *exp, Operand *lt, Operand *lf) {
 
 vector<InterCode> translate_Args(Node *args, vector<Operand *> &argList) {
     if (args->child.size() == 1) {
-        //EXP
+        //Exp
         Operand *tp = new_place();
         vector<InterCode> code = translate_Exp(args->child[0], tp);
         argList.push_back(tp);
         return code;
     } else {
-        //EXP COMMA ARGS
+        //Exp COMMA ARGS
         Operand *tp = new_place();
         vector<InterCode> code1 = translate_Exp(args->child[0], tp);
         argList.push_back(tp);
@@ -459,7 +524,7 @@ vector<InterCode> translate_FunDec(Node *funDec) {
     vector<InterCode> ics;
     string func_name = funDec->child[0]->get_name();
     ics.emplace_back(2, new Operand(OpType::NAME, func_name));
-    if(funDec->child.size() == 4) {
+    if (funDec->child.size() == 4) {
         FieldList *fieldList = symbolTable[func_name]->get_fieldList();
         Operand *var = get_varOp(fieldList->name);
         ics.emplace_back(20, var);
@@ -470,6 +535,57 @@ vector<InterCode> translate_FunDec(Node *funDec) {
 vector<InterCode> translate_Def(Node *Def) {
     return vector<InterCode>();
 }
+
+// ExtDef: Specifier FunDec CompSt
+vector<InterCode> merge_ExtDef(Node *extDef) {
+    vector<InterCode> ics;
+    auto funDec_codes = translate_FunDec(extDef->child[1]);
+    auto compSt_codes = merge_CompSt(extDef->child[2]);
+    ics.insert(ics.end(), funDec_codes.begin(), funDec_codes.end());
+    ics.insert(ics.end(), compSt_codes.begin(), compSt_codes.end());
+    return ics;
+}
+
+// LC DefList StmtList RC
+vector<InterCode> merge_CompSt(Node *compSt) {
+    vector<InterCode> ics;
+    auto defList_codes = merge_DefList(compSt->child[1]);
+    auto stmtList_codes = merge_StmtList(compSt->child[2]);
+    ics.insert(ics.end(), defList_codes.begin(), defList_codes.end());
+    ics.insert(ics.end(), stmtList_codes.begin(), stmtList_codes.end());
+    return ics;
+}
+
+// null | Def DefList
+vector<InterCode> merge_DefList(Node *defList) {
+    Node *p = defList;
+    vector<InterCode> ics;
+    while (!p->child.empty()) {
+        auto child_codes = translate_Def(p->child[0]);
+        ics.insert(ics.end(), child_codes.begin(), child_codes.end());
+        p = p->child[1];
+    }
+    return ics;
+}
+
+// null | Stmt StmtList
+vector<InterCode> merge_StmtList(Node *stmtList) {
+    Node *p = stmtList;
+    vector<InterCode> ics;
+    while (!p->child.empty()) {
+        auto child_codes = translate_Stmt(p->child[0]);
+        ics.insert(ics.end(), child_codes.begin(), child_codes.end());
+        p = p->child[1];
+    }
+    return ics;
+}
+
+void print_codes(vector<InterCode> &ics) {
+    for (auto & ic : ics) {
+        ic.print();
+    }
+}
+
 
 
 
