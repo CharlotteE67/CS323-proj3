@@ -534,7 +534,7 @@ InterCode translate_arr_Dec(Node *varDec){
         varDec = varDec->child[0];
     }
     string name = varDec->get_name();
-    int size = get_arr_size(name);
+    int size = getTypeByName(name)->size;
     Operand *x = get_varOp(name);
     Operand *y = new Operand(OpType::IMMEDIATE,to_string(size));
     return InterCode(19,x,y);

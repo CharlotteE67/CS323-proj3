@@ -4,22 +4,10 @@ map<string, Type *> symbolTable{
     make_pair("read", get_read()),
     make_pair("write", get_write())
 };
-static map<string, Type *> strToType = {};
-static map<Type *, string> typeToStr = {};
 
-int get_arr_size(string name){
-    
-    Type *type = symbolTable[name];
-    Array *arr = type->get_arrType();
-    int field = 4;
-    while(true){
-        field *= arr->get_arr_size();
-        if(arr->get_next_type()->category==CATEGORY::ARRAY){break;}
-        arr = arr->get_next_type()->get_arrType();
-    }
 
-    return field;
-
+Type *getTypeByName(string name){
+    return symbolTable[name];
 }
 
 Type *get_read() {
@@ -98,6 +86,7 @@ FieldList *defPrimitiveType(Node *def, Type *outlayer) {
                     int arrSize = varDec->child[2]->get_intVal();
                     Array *arr = new Array(base, arrSize);
                     Type *upper = new Type(varName, arr);
+                    upper->size = base->size * arrSize;
                     base = upper;
                     varDec = varDec->child[0];
                 }

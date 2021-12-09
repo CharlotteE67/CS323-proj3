@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int get_arr_size(string name);
+Type* getTypeByName(string name);
 
 Type* get_read();
 
