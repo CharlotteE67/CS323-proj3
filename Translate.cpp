@@ -462,56 +462,83 @@ InterCode translate_arr_Dec(Node *varDec){
     return InterCode(19,x,y);
 }
 
-//EXP -> EXP [ EXP ]
-vector<InterCode> translate_arr_addr(Node *exp,Operand *&op){
-    vector<Operand*> offsetList;
-    vector<InterCode> code;
-    int offset = 0;
-    while(exp->child.size()!=1){
-        Operand *t = new_place();
-        vector<InterCode> cal = translate_Exp(exp->child[2],t);
-        code.insert(code.end(),cal.begin(),cal.end());
-        offsetList.push_back(t);
-        exp = exp->child[0];
-    }
-    Operand *base = new_place();
-    translate_Exp(exp,base);
+// Exp -> Exp DOT Exp
+// Exp -> Exp [ Exp ]
+vector<InterCode> translate_offset(Node *exp, Operand *&op, Operand *offset){
+    vector<InterCode> ics;
+    switch (exp->child.size()) {
+        case 1:
 
-    Type *arr = getTypeByName(exp->child[0]->get_name());
-    Operand *sum = new Operand(OpType::IMMEDIATE,to_string(0));
-    for (int i = offsetList.size()-1; i >= 0; i--)
-    {
-        /* code */
-        arr = arr->get_next_type();
-        Operand *t = new_place();
-        //t = j * #size
-        code.push_back(InterCode(6,t,offsetList[i],new Operand(OpType::IMMEDIATE,to_string(arr->size))));
-        //sum = sum + t
-        code.push_back(InterCode(4,sum,sum,t));
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
     }
 
-    //t = &base
-    //op = t + sum
-    Operand *tmp = new_place();
-    code.push_back(InterCode(8,tmp,base));
-    code.push_back(InterCode(4,op,tmp,sum));
-
-    return code;
+//    vector<Operand*> offsetList;
+//    vector<InterCode> code;
+//    while(exp->child.size()!=1){
+//        Operand *t = new_place();
+//        vector<InterCode> cal = translate_Exp(exp->child[2],t);
+//        code.insert(code.end(),cal.begin(),cal.end());
+//        offsetList.push_back(t);
+//        exp = exp->child[0];
+//    }
+//    Operand *base = new_place();
+//    translate_Exp(exp,base);
+//
+//    Type *arr = getTypeByName(exp->child[0]->get_name());
+//    Operand *sum = new Operand(OpType::IMMEDIATE,to_string(0));
+//    for (int i = offsetList.size()-1; i >= 0; i--)
+//    {
+//        /* code */
+//        arr = arr->get_next_type();
+//        Operand *t = new_place();
+//        //t = j * #size
+//        code.push_back(InterCode(6,t,offsetList[i],new Operand(OpType::IMMEDIATE,to_string(arr->size))));
+//        //sum = sum + t
+//        code.push_back(InterCode(4,sum,sum,t));
+//    }
+//
+//    //t = &base
+//    //op = t + sum
+//    Operand *tmp = new_place();
+//    code.push_back(InterCode(8,tmp,base));
+//    code.push_back(InterCode(4,op,tmp,sum));
+//
+//    return code;
 
 }
 
 
-Operand *new_place() {
-    return new Operand(OpType::PLACE);
+Operand *new_place(AddrType at) {
+    switch (at) {
+        case AddrType::VALUE:
+            return new Operand(OpType::PLACE);
+        case AddrType::ADDR:
+        case AddrType::PTR:
+            return new Operand(OpType::PLACE, at);
+    }
 }
 
 Operand *new_label() {
     return new Operand(OpType::LABEL);
 }
 
-Operand *get_varOp(string var) {
+Operand *get_varOp(string var, AddrType at) {
     if (var_table.count(var)) return var_table[var];
-    auto *op = new Operand(OpType::VAR);
+
+    Operand *op;
+    switch (at) {
+        case AddrType::VALUE:
+            op = new Operand(OpType::VAR);
+            break;
+        case AddrType::ADDR:
+        case AddrType::PTR:
+            op = new Operand(OpType::VAR, at);
+            break;
+    }
     var_table[var] = op;
     return op;
 }

@@ -8,13 +8,13 @@
 
 using namespace std;
 
-Operand *new_place();
+Operand *new_place(AddrType at = AddrType::VALUE);
 
 Operand *new_label();
 
 Operand *new_immediate(int i);
 
-Operand *get_varOp(string var);
+Operand *get_varOp(string var, AddrType at = AddrType::VALUE);
 
 vector<InterCode> translate_cond_Exp(Node *exp, Operand *l1, Operand *l2);
 

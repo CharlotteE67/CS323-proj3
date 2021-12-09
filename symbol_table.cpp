@@ -745,7 +745,6 @@ void semanticErrors(int typeID, int lineNo, string arg1, string arg2) {
  * return a bool value
  */
 bool isMatchedType(Type *t1, Type *t2) {
-    Type *v1 = t1, *v2 = t2;
     if (t1 == nullptr || t2 == nullptr) return false;
     if (t1->category != t2->category) return false;
     if (t1->category == CATEGORY::ARRAY) {

@@ -41,6 +41,14 @@ int Type::getSize() {
     return sz;
 }
 
+Type *Type::get_next_type() {
+    return type.arr->base;
+}
+
+Array *Type::get_arrType() {
+    return type.arr;
+}
+
 Array::Array(Type *base, int size) : base(base), size(size) {}
 
 FieldList::FieldList() {type = nullptr; next = nullptr;}

@@ -48,8 +48,8 @@ public:
 
     Type(string name, CATEGORY cat);
 
-    Array *get_arrType() const{return type.arr;}
-    Type *get_next_type(){return type.arr->base;}
+    Array *get_arrType();
+    Type *get_next_type();
 
     void set_structType(Type *t){type.st = t;}
     Type *get_structType(){return type.st;}

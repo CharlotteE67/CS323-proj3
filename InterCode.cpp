@@ -45,6 +45,18 @@ string Operand::get_name() {
             str = name;
             break;
     }
+
+    switch (addr_type) {
+        case AddrType::ADDR:
+            str = "&" + str;
+            break;
+        case AddrType::PTR:
+            str = "*" + str;
+            break;
+        case AddrType::VALUE:
+            break;
+    }
+
     return str;
 }
 
@@ -129,9 +141,11 @@ void InterCode::print() {
     }
 }
 
-Operand::Operand(OpType type) : type(type) {}
+Operand::Operand(OpType type) : type(type){}
 
 Operand::Operand(OpType type, string name) : type(type), name(name) {}
+
+Operand::Operand(OpType type, AddrType addrType) : type(type), addr_type(addrType) {}
 
 InterCode::InterCode(int type, Operand *x, Operand *y, Operand *z) : interCodeType(static_cast<InterCodeType>(type)),
                                                                      x(x), y(y), z(z) {

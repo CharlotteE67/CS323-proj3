@@ -14,14 +14,23 @@ enum class OpType {
     NONE
 };
 
+enum class AddrType {
+    VALUE,
+    ADDR,
+    PTR
+};
+
 class Operand {
 public:
     OpType type;
     string name;
+    AddrType addr_type = AddrType::VALUE;
 
     Operand(OpType type);
 
     Operand(OpType type, string name);
+
+    Operand(OpType type, AddrType addrType);
 
     string get_name();
 };
