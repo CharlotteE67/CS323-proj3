@@ -505,6 +505,42 @@ vector<InterCode> translate_Args(Node *args, vector<Operand *> &argList) {
         return code1;
     }
 }
+/*  DefList -> Def DefList
+        | $
+    Def -> Specifier DecList SEMI
+    DecList -> Dec
+        | Dec COMMA DecList
+    Dec -> VarDec
+        | VarDec ASSIGN Exp
+    VarDec -> ID
+        | VarDec LB INT RB
+*/
+vector<InterCode> translate_arr(Node *defL){
+    vector<InterCode> codes;
+    if(defL->child.empty()){return codes;}
+    Node *def = defL->child[0];
+    while(true){
+        Node *decL = def->child[1];
+        Node *dec = decL->child[0];
+        while(true){
+            
+            InterCode tmp = translate_arr_Dec(dec->child[0]);
+            if(tmp.interCodeType!=InterCodeType::NONE){
+                codes.push_back(tmp);
+            }
+            if(decL->child.size()==1){break;}
+            decL = decL->child[2];
+            dec = decL->child[0];
+        }
+
+        if(defL->child.size()==1){break;}
+        defL = defL->child[1];
+        def = defL -> child[0];
+    }
+
+    return codes;
+}
+
 
 InterCode translate_arr_Dec(Node *varDec){
     if(varDec->child.size()==1){return {};}
@@ -514,7 +550,7 @@ InterCode translate_arr_Dec(Node *varDec){
     string name = varDec->get_name();
     int size = get_arr_size(name);
     Operand *x = get_varOp(name);
-    Operand *y = new Operand(OpType::IMMIDIATE,to_string(size));
+    Operand *y = new Operand(OpType::IMMEDIATE,to_string(size));
     return InterCode(19,x,y);
 }
 
@@ -575,14 +611,7 @@ vector<InterCode> merge_CompSt(Node *compSt) {
 
 // null | Def DefList
 vector<InterCode> merge_DefList(Node *defList) {
-    Node *p = defList;
-    vector<InterCode> ics;
-    while (!p->child.empty()) {
-        auto child_codes = translate_Def(p->child[0]);
-        ics.insert(ics.end(), child_codes.begin(), child_codes.end());
-        p = p->child[1];
-    }
-    return ics;
+    return translate_arr(defList);
 }
 
 // null | Stmt StmtList
