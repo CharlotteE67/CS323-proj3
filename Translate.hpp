@@ -3,6 +3,7 @@
 
 #include "spl_node.hpp"
 #include "InterCode.hpp"
+#include "symbol_table.hpp"
 #include <vector>
 
 using namespace std;

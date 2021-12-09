@@ -45,6 +45,8 @@ public:
 
     Type(string name, CATEGORY cat);
 
+    Array *get_arrType() const{return type.arr;}
+
     void set_structType(Type *t){type.st = t;}
     Type *get_structType(){return type.st;}
 
@@ -65,6 +67,8 @@ public:
     int size;
 
     Array(Type *base, int size);
+    int get_arr_size(){return size;}
+    Type *get_next_type(){return base;}
 };
 
 class FieldList {

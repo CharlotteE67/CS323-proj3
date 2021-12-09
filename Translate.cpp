@@ -501,6 +501,18 @@ vector<InterCode> translate_Args(Node *args, vector<Operand *> &argList) {
     }
 }
 
+InterCode translate_arr_Dec(Node *varDec){
+    if(varDec->child.size()==1){return {};}
+    while(varDec->child.size()!=1){
+        varDec = varDec->child[0];
+    }
+    string name = varDec->get_name();
+    int size = get_arr_size(name);
+    Operand *x = get_varOp(name);
+    Operand *y = new Operand(OpType::IMMIDIATE,to_string(size));
+    return InterCode(19,x,y);
+}
+
 Operand *new_place() {
     return new Operand(OpType::PLACE);
 }
