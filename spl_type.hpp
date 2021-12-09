@@ -34,6 +34,7 @@ public:
     CATEGORY category;
     dTypes type;
     Type *typePointer = nullptr; // For func: return type; For struct number: nearest outlayer struct
+    int size;
 
     Type();
 

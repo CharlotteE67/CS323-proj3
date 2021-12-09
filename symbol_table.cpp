@@ -443,7 +443,7 @@ void funcDec(Node *exDef) {
     string funcName = exDef->child[1]->child[0]->get_name();
     string returnName;
     if (symbolTable.count(funcName) != 0) {
-        //func redifined
+        // func redifined
         semanticErrors(4, exDef->get_lineNo());
         return;
     }
@@ -451,7 +451,7 @@ void funcDec(Node *exDef) {
     Type *funcType = new Type(funcName, CATEGORY::FUNCTION);
 
     if (defGetTypeName(exDef) == "StructSpecifier") {
-        //struct
+        // struct
         returnName = defGetStructName(exDef);
         funcType->typePointer = new Type(funcName, symbolTable[returnName]);
     } else {
@@ -461,7 +461,7 @@ void funcDec(Node *exDef) {
 
     symbolTable[funcName] = funcType;
 
-    //function arg
+    // function arg
     Node *funDec = exDef->child[1];
     FieldList *args = nullptr;
     if (funDec->child.size() == 4) {
