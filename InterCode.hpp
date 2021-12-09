@@ -27,7 +27,8 @@ public:
 };
 
 enum class InterCodeType {
-    LABEL=1,
+    NONE = 0,
+    LABEL,
     FUNCTION,
     ASSIGN,
     ADD, SUB, MUL, DIV,

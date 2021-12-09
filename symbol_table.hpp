@@ -12,6 +12,8 @@
 
 using namespace std;
 
+int get_arr_size(string name);
+
 Type* get_read();
 
 Type* get_write();

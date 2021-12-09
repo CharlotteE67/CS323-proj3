@@ -7,6 +7,20 @@ map<string, Type *> symbolTable{
 static map<string, Type *> strToType = {};
 static map<Type *, string> typeToStr = {};
 
+int get_arr_size(string name){
+    
+    Type *type = symbolTable[name];
+    Array *arr = type->get_arrType();
+    int field = 4;
+    while(true){
+        field *= arr->get_arr_size();
+        if(arr->get_next_type()->category==CATEGORY::ARRAY){break;}
+        arr = arr->get_next_type()->get_arrType();
+    }
+
+    return field;
+
+}
 
 Type *get_read() {
     Type *read = new Type("read", CATEGORY::FUNCTION);
