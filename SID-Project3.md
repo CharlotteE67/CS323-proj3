@@ -48,65 +48,58 @@ public:
 
 ### B. Translate
 
-​		After that, we continue to build up translate functions for expressions, statements, arguments and so on. According to the given schemes tables, we implement the translate action for each rule. The results are stored in `vector<InterCode>` since the result may contains more than one TAC instruction. 
+​		After that, we continue to build up translate functions for expressions, statements, arguments and so on. According to the given schemes tables, we implement the translate action for each rule. The results are stored in `vector<InterCode>` since the result may contains more than one TAC instruction. We use merge method to construct TAC result for `ExtDef` , `CompSt`, `DefList` and `StmtList` since we can translate them using their children components.
 
-​		When translating, we may need to new place, label or immediate number. We set `new_place()` , `new_label()` and `new_immediate()` functions to generate them. Specially, we will not give exact id for new place and new label, which will be given when constructing result(Designed in `InterCode.cpp`).
+​		When translating, we may need to new place, label, variable or immediate number. We set `new_place()` , `new_label()` , `get_varOp()`  and `new_immediate()` functions to generate them. Specially, we will not give exact id for new place, new label and new variable, which will be given when constructing result(Designed in `InterCode.cpp`).
 
 ​															<img src="SID-Project3.assets/image-20211209204601249.png" alt="image-20211209204601249" style="zoom:50%;" /> 
 
-​													Figure.1 Using global counter to give name
+​													Figure.1 Using global counters to give names
 
-​		
+### C. Bonus
+
+  1. What's more, we support translating array declaration which is provided in `translate_arr()` and `translate_arr_Dec()` functions. Also, we modify the class `spl_type` and add an int member `size` for it to store the space cost for possible usages.   
+
+     ​										<img src="SID-Project3.assets/image-20211209211103927.png" alt="image-20211209211103927" style="zoom:50%;" /> 
+
+​													Figure.2 `translate_arr_Dec()` function
+
+​			When translating array or structure, we can start from its primitive type which is set in type constructor. Using them and the array dimensions or struct contents to count for final space cost. It's useful for TAC-19 which is `DEC x [size]` .
+
+<img src="SID-Project3.assets/image-20211209211359408.png" alt="image-20211209211359408" style="zoom:50%;" />
+
+​													Figure.3 Set size for primitive type
+
+  2. We support `For` statements' translation which is implemented in `vector<InterCode> translate_Stmt(Node *stmt)` . Its actions are similar as `While` 's actions. 
+
+     <img src="SID-Project3.assets/image-20211209212138879.png" alt="image-20211209212138879" style="zoom:50%;" />
+
+     ​											Figure.4 Translation For Statements
+
+  3. 
 
 
 
-​													Figure.2 Call `semanticErrors()` in function
+### D. Optimization
 
-### 	C. Other Key Points
+ 1. When translating expressions, if the expression is a single INT or or ID, we don't need to store the operand in given place. Thus, we will not add the TAC instruction into translation result.
 
-  1. We modified `spl_node.hpp` and add a field named `assignable` which is set to `false` initially to record whether a node can be assigned or not. It's mainly used in `Exp` syntax and only `Exp -> Exp LB Exp RB | ID `  can be directly assigned. Considering continuous assign, expression with parentheses and structure with DOT, `Exp -> Exp ASSIGN Exp | LP Exp RP | Exp DOT ID` can be assign with the judgement of the first `Exp`'s assignable.
+    <img src="SID-Project3.assets/image-20211209212614831.png" alt="image-20211209212614831" style="zoom:50%;" />
 
-     ​													Figure.3  set_assignable()																				
+    ​											Figure.5 Delete unnecessary instructions
 
-  2. In SPL_Type, we define `STRUCTURE`, `STRUCTVAR` and `FUNCTION` to represent the category for structure type, structure's instance type and function type. For example, `struct b{ struct a ba;};` **b** is `STRUCTURE` and **ba** is `STRUCTVAR`.
-
-     Also, the field `Type *typePointer = nullptr;` in Type is used for function and structure which store their return type and nearest out-layer struct when needed.
-
-  3. **When facing error, especially in `Exp` syntax, we will try to ignore it as detecting other type of error. For example, if there are INT and FLOAT variables to be added and assigned to a INT variable, then the right side's varType will be nullptr. When checking ASSIGN, it will ignore the error and directly return as receiving nullptr. What' more, if left side is not assignable, we will also return directly and ignore type check between two side of ASSIGN.** e.g. (Official test cases) In `test_2_r07.spl`  line 10, since we detect ***type 7*** error in right side, we set the varType as nullptr for right side and ignore type check at ASSIGN. Similarly for `test_2_r12.spl` line 15, `test_2_r14.spl`  line 10 & 12,  the left side of ASSIGN has nullptr for varType. 
-
-### D. Bonus
-
-1. When using INT(not ID) to access array, we can detect whether it's out of bound. ***Type 22*** is defined for it. (shown in Figure.2)
-2. Considering continuous assign, expression with parentheses for type 6 error, using `assignable` field in Node to recursively record the node information about assignable. (shown https://github.com/CharlotteE67/CS323-proj2.git Figure.4)
-3. When accessing inside number of struct, the complier should detect it as error according to CATEGORY::STURCTVAR. ***Type 20*** is defined for reporting the error. Also, structure declare name misuse will be detect as ***Type 21*** error.
-3. Besides, we can check equivalence between structures. For example, `struct A{ int barrr[8]; }` and `struct B { int carrr[8]}` are considered equivalent and assignable.
+ 2. 
 
 ## III. Test Cases
 
-​			For evaluation purpose, our test cases contain **14** different semantic errors. All of test cases are saved in `./test/` folder.
+​			For extra test cases, we put them in `./test-ex/` folder which contains four test cases. They are used for array&structure translation, for-statements translation, .......
 
-​			For extra test cases, we put them in `./test-ex/` folder which contains four test cases. They are used for checking ***type 20, 21, 22*** error and structure equivalence.
-
-​			**- Test case with Type 21 error**
+​			**- Test case with Array Translation**
 
 ```SPL
-struct a {
-    int aa;
-};
-struct b{
-    struct a ba;
-};
-struct c{
-    struct a ca;
-};
-int main(){
-    struct b B;
-    struct c C;
-    b.ba = C.ca;
-
-}
+// TBD
 -----------------------------------------------
-Error type 21 at Line 13: struct declare name misuse.
+// TBD
 ```
 
 
