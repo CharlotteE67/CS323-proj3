@@ -24,6 +24,10 @@ vector<InterCode> translate_Stmt(Node *stmt);
 
 vector<InterCode> translate_Args(Node *args, vector<Operand *> &argList);
 
+vector<InterCode> translate_arr(Node *defL);
+
+InterCode translate_arr_Dec(Node *varDec);
+
 vector<InterCode> translate_FunDec(Node *funDec);
 
 vector<InterCode> merge_ExtDef(Node *extDef);
