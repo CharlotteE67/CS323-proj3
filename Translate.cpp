@@ -32,7 +32,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
             if (exp->child[0]->get_name() == "MINUS" && exp->child[1]->get_name() == "Exp") {
                 Operand *tp = new_place();
                 Operand *zero = new_immidiate(0);
-                ics = translate_Exp(exp, tp);
+                ics = translate_Exp(exp->child[1], tp);
                 ics.emplace_back(5, place, zero, tp);
             }
                 // NOT Exp
@@ -165,7 +165,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 string func_name = exp->child[0]->get_name();
                 if (func_name == "write") {
                     Operand *tp = new_place();
-                    ics = translate_Exp(exp->child[2], tp);
+                    ics = translate_Exp(exp->child[2]->child[0], tp);
                     ics.emplace_back(24, place, tp);
                 } else {
                     auto *func = new Operand(OpType::NAME, func_name);
