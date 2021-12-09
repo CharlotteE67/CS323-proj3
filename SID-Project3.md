@@ -6,7 +6,7 @@
 
 ## I. Overview
 
-​		In this project, we are required to implement the generation of intermediate code of given programs with SPL language. We suppose that there is no lexical or semantic error. Three Address Codes(TAC) are generated according to given rules. Our files can be run successfully with GCC version 7.4.0, GNU Flex version 2.6.4 and GNU Bison version 3.0.4 .
+​		In this project, we are required to implement the generation of intermediate code of given programs with SPL language. We suppose that there is no lexical or semantic error. **Three Address Codes(TAC)** are generated according to given rules. Our files can be run successfully with GCC version 7.4.0, GNU Flex version 2.6.4 and GNU Bison version 3.0.4 .
 
 
 
@@ -48,29 +48,23 @@ public:
 
 ### B. Translate
 
-​		After that, we continue to build up translate functions for expressions, statements, arguments and so on. According to the given schemes tables, we implement the translate action for each rule.
+​		After that, we continue to build up translate functions for expressions, statements, arguments and so on. According to the given schemes tables, we implement the translate action for each rule. The results are stored in `vector<InterCode>` since the result may contains more than one TAC instruction. 
 
-​		According to given 15-type semantic errors, we first locate their position in `syntax.y` so that we can add our self-defined action or function to check possible semantic errors. For example, we add function `checkRvalueOnLeft($1)` and `checkAssignOp($1, $3, $$)`  to check ***type 6*** and ***type 5*** error respectively. What's more, if there is no error to report, the last function will `set_varType()` to root node which will transfer the Type information to the upper level.
+​		When translating, we may need to new place, label or immediate number. We set `new_place()` , `new_label()` and `new_immediate()` functions to generate them. Specially, we will not give exact id for new place and new label, which will be given when constructing result(Designed in `InterCode.cpp`).
 
-​														<img src="SID-Project2.assets/image-20211121142542419.png" alt="image-20211121142542419"  />
+​															<img src="SID-Project3.assets/image-20211209204601249.png" alt="image-20211209204601249" style="zoom:50%;" /> 
 
-<img src="SID-Project2.assets/image-20211120234916090.png" alt="image-20211120234916090" style="zoom:50%;" />
+​													Figure.1 Using global counter to give name
 
-​													Figure.1 Add self-defined function
+​		
 
-​		When detecting errors, we will call `semanticErrors(int typeID, int lineNo, string arg1, string arg2)` to report the semantic errors. `arg1` and `arg2` are used to store the information about relative variables, function and other value.
 
-<img src="SID-Project2.assets/image-20211121143021112.png" alt="image-20211121143021112"  />
-
-<img src="SID-Project2.assets/image-20211120235304929.png" alt="image-20211120235304929" style="zoom:50%;" />
 
 ​													Figure.2 Call `semanticErrors()` in function
 
 ### 	C. Other Key Points
 
   1. We modified `spl_node.hpp` and add a field named `assignable` which is set to `false` initially to record whether a node can be assigned or not. It's mainly used in `Exp` syntax and only `Exp -> Exp LB Exp RB | ID `  can be directly assigned. Considering continuous assign, expression with parentheses and structure with DOT, `Exp -> Exp ASSIGN Exp | LP Exp RP | Exp DOT ID` can be assign with the judgement of the first `Exp`'s assignable.
-
-     ![image-20211121142416354](SID-Project2.assets/image-20211121142416354.png)
 
      ​													Figure.3  set_assignable()																				
 
@@ -119,4 +113,4 @@ Error type 21 at Line 13: struct declare name misuse.
 
 ## IV. Instructions
 
-​			Change directory to the root path and using `make splc` to create `splc` in `./bin` root for spl codes' parsing. Then using `bin/splc test/<file_name>` to create semantic analysis result. And you can use `make clean` to delete all created files.
+​			Change directory to the root path and using `make splc` to create `splc` in `./bin` root for spl codes' parsing. Then using `bin/splc <test_root>/<test_file_name>` to create immediate code result. And you can use `make clean` to delete all created files.

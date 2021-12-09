@@ -250,86 +250,8 @@ vector<InterCode> translate_Stmt(Node *stmt) {
     // FOR LP Def Exp SEMI Exp RP Stmt
     else if (stmt->child.size() == 8) {
         // Def
-        /* Def -> Specifier DecList SEMI
-            Specifier -> TYPE(INT)
-            DecList -> Dec | Dec COMMA DecList
-                Dec -> VarDec | VarDec ASSIGN Exp
-                    VarDec -> ID(INT) */
-        /*
-        array
-        int a[2] (= Exp);
-        VarDec -> ID(INT) | VarDec LB INT RB (ARRAY)
-        */
-        Node *decList = stmt->child[2]->child[1];
-        while (decList->child.size() == 3) {
-            if (decList->child[0]->child.size() == 1) { // VarDec
-                int size = 1;
-                Node *varDec = decList->child[0]->child[0];
-                while (varDec->child.size() == 4){
-                    size *= varDec->child[2]->get_intVal();
-                    varDec = varDec->child[0];
-                }
-                Operand *op = get_varOp(varDec->child[0]->child[0]->get_name());
-                if (size != 1){ // array need to DEC
-                    translate.emplace_back(19, op, Operand(OpType::NAME, to_string(size)));   
-                }
-            } else { // VarDec ASSIGN Exp
-                // construct Exp -> Exp ASSIGN Exp
-                int size = 1;
-                Node *varDec = decList->child[0]->child[0];
-                while (varDec->child.size() == 4){
-                    size *= varDec->child[2]->get_intVal();
-                    varDec = varDec->child[0];
-                }
-                Operand *op = get_varOp(varDec->child[0]->child[0]->get_name());
-                if (size != 1){ // array need to DEC
-                    translate.emplace_back(19, op, Operand(OpType::NAME, to_string(size)));   
-                }
-                Node *id = varDec->child[0];
-                Node *construct = new Node("Exp", id->get_lineNo());
-                vector<Node *> child = {id};
-                Node *exp_1 = new Node("Exp", id->get_lineNo(), child);
-                vector<Node *> childs = {exp_1, new Node("ASSIGN"), decList->child[0]->child[2]};
-                construct->set_child(childs);
-                Operand *tp = new_place();
-                vector<InterCode> assigns = translate_Exp(construct, tp);
-                translate.insert(translate.end(), assigns.begin(), assigns.end());
-            }
-            decList = decList->child[2];
-        }
-        if (decList->child[0]->child.size() == 1) { // VarDec
-             int size = 1;
-            Node *varDec = decList->child[0]->child[0];
-            while (varDec->child.size() == 4){
-                size *= varDec->child[2]->get_intVal();
-                varDec = varDec->child[0];
-            }
-            Operand *op = get_varOp(varDec->child[0]->child[0]->get_name());
-            if (size != 1){ // array need to DEC
-                translate.emplace_back(19, op, Operand(OpType::NAME, to_string(size)));   
-            }
-        } else { // VarDec ASSIGN Exp
-            // construct Exp -> Exp ASSIGN Exp
-                int size = 1;
-                Node *varDec = decList->child[0]->child[0];
-                while (varDec->child.size() == 4){
-                    size *= varDec->child[2]->get_intVal();
-                    varDec = varDec->child[0];
-                }
-                Operand *op = get_varOp(varDec->child[0]->child[0]->get_name());
-                if (size != 1){ // array need to DEC
-                    translate.emplace_back(19, op, Operand(OpType::NAME, to_string(size)));   
-                }
-                Node *id = varDec->child[0];
-                Node *construct = new Node("Exp", id->get_lineNo());
-                vector<Node *> child = {id};
-                Node *exp_1 = new Node("Exp", id->get_lineNo(), child);
-                vector<Node *> childs = {exp_1, new Node("ASSIGN"), decList->child[0]->child[2]};
-                construct->set_child(childs);
-                Operand *tp = new_place();
-                vector<InterCode> assigns = translate_Exp(construct, tp);
-                translate.insert(translate.end(), assigns.begin(), assigns.end());
-        }
+        vector<InterCode> def = translate_Def(stmt->child[2]);
+        translate.insert(translate.end(), def.begin(), def.end());
         // WHILE Exp_2 Stmt + Exp_3
         Operand *lb1 = new_label();
         Operand *lb2 = new_label();
