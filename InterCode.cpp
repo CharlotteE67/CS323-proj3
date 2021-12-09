@@ -38,7 +38,7 @@ string Operand::get_name() {
         case OpType::VAR:
             str = "v" + name;
             break;
-        case OpType::IMMIDIATE:
+        case OpType::IMMEDIATE:
             str = "#" + name;
             break;
         case OpType::NAME:
@@ -50,12 +50,15 @@ string Operand::get_name() {
 
 void InterCode::print() {
 //    cout << (int)interCodeType << endl;
+    if (x->type == OpType::NONE) {
+        return;
+    }
     switch (interCodeType) {
         case InterCodeType::LABEL:
-            printf("LABEL %s\n", x->get_name().c_str());
+            printf("LABEL %s :\n", x->get_name().c_str());
             break;
         case InterCodeType::FUNCTION:
-            printf("FUNCTION %s\n", x->get_name().c_str());
+            printf("FUNCTION %s :\n", x->get_name().c_str());
             break;
         case InterCodeType::ASSIGN:
             printf("%s := %s\n", x->get_name().c_str(), y->get_name().c_str());
