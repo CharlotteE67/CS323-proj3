@@ -12,7 +12,7 @@ Operand *new_place();
 
 Operand *new_label();
 
-Operand *new_immidiate(int i);
+Operand *new_immediate(int i);
 
 Operand *get_varOp(string var);
 

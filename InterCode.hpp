@@ -9,8 +9,9 @@ enum class OpType {
     PLACE,
     LABEL,
     VAR,
-    IMMIDIATE,
-    NAME
+    IMMEDIATE,
+    NAME,
+    NONE
 };
 
 class Operand {
