@@ -86,7 +86,7 @@ FieldList *defPrimitiveType(Node *def, Type *outlayer) {
                     int arrSize = varDec->child[2]->get_intVal();
                     Array *arr = new Array(base, arrSize);
                     Type *upper = new Type(varName, arr);
-                    upper->size = base->size * arrSize;
+                    upper->size = base->getSize() * arrSize;
                     base = upper;
                     varDec = varDec->child[0];
                 }
@@ -108,7 +108,7 @@ FieldList *defPrimitiveType(Node *def, Type *outlayer) {
 
 }
 
-// todo: check assign Exp
+// check assign Exp
 FieldList *defStructType(Node *def, Type *outlayer) {
     Node *decList = def->child[1];
     string structName = defGetStructName(def);
@@ -147,6 +147,7 @@ FieldList *defStructType(Node *def, Type *outlayer) {
                     int arrSize = varDec->child[2]->get_intVal();
                     Array *arr = new Array(base, arrSize);
                     Type *upper = new Type(varName, arr);
+                    upper->size = base->getSize() * arrSize;
                     base = upper;
                     varDec = varDec->child[0];
                 }
@@ -308,8 +309,9 @@ void structDec(Node *ssp) {
 
     while (!defL->child.empty()) {
         Node *def = defL->child[0];
-        //def visit
+        // def visit
         FieldList *defStu = defVisit(def, stu);
+
         while (ptr->next != nullptr) {
             ptr = ptr->next;
         }
@@ -318,6 +320,7 @@ void structDec(Node *ssp) {
     }
 
     stu->set_fieldList(head->next);
+    stu->size = count_struct_size(stu);
     // Type *stu = new Type(stuName, head->next);
     // symbolTable[stuName] = stu;
 
@@ -772,5 +775,16 @@ bool isMatchedType(Type *t1, Type *t2) {
     }
     // struct var OR function
     return false;
+}
+
+int count_struct_size(Type *type) {
+
+    int size = 0;
+    FieldList *fl = type->get_fieldList();
+    while (fl != nullptr) {
+        size += fl->type->getSize();
+        fl = fl->next;
+    }
+    return size;
 }
 

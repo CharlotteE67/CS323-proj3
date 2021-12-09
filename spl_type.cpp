@@ -23,6 +23,24 @@ Type::Type(string name, CATEGORY ca): name(name), category(ca){
 
 }
 
+int Type::getSize() {
+    int sz = 0;
+    switch (category) {
+
+        case CATEGORY::PRIMITIVE:
+        case CATEGORY::ARRAY:
+        case CATEGORY::STRUCTURE:
+            sz = size;
+            break;
+        case CATEGORY::STRUCTVAR:
+            sz = get_structType()->getSize();
+            break;
+        case CATEGORY::FUNCTION:
+            break;
+    }
+    return sz;
+}
+
 Array::Array(Type *base, int size) : base(base), size(size) {}
 
 FieldList::FieldList() {type = nullptr; next = nullptr;}

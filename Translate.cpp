@@ -423,6 +423,20 @@ vector<InterCode> translate_Args(Node *args, vector<Operand *> &argList) {
     VarDec -> ID
         | VarDec LB INT RB
 */
+
+
+InterCode translate_arr_Dec(Node *varDec){
+    if(varDec->child.size()==1){return {};}
+    while(varDec->child.size()!=1){
+        varDec = varDec->child[0];
+    }
+    string name = varDec->get_name();
+    int size = getTypeByName(name)->size;
+    Operand *x = get_varOp(name);
+    Operand *y = new Operand(OpType::IMMEDIATE,to_string(size));
+    return InterCode(19,x,y);
+}
+
 vector<InterCode> translate_arr(Node *defL){
     vector<InterCode> codes;
     if(defL->child.empty()){return codes;}
@@ -447,19 +461,6 @@ vector<InterCode> translate_arr(Node *defL){
     }
 
     return codes;
-}
-
-
-InterCode translate_arr_Dec(Node *varDec){
-    if(varDec->child.size()==1){return {};}
-    while(varDec->child.size()!=1){
-        varDec = varDec->child[0];
-    }
-    string name = varDec->get_name();
-    int size = getTypeByName(name)->size;
-    Operand *x = get_varOp(name);
-    Operand *y = new Operand(OpType::IMMEDIATE,to_string(size));
-    return InterCode(19,x,y);
 }
 
 Operand *new_place() {

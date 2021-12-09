@@ -36,6 +36,8 @@ public:
     Type *typePointer = nullptr; // For func: return type; For struct number: nearest outlayer struct
     int size;
 
+    int getSize();
+
     Type();
 
     Type(string name, string pri);
