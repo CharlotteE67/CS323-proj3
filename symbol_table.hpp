@@ -62,4 +62,6 @@ void checkIndexBound(Node *arr, Node *index);
 
 void checkArrayType(Node *root, Node *node);
 
+int count_struct_size(Type *type);
+
 #endif
