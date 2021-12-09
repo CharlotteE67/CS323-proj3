@@ -441,9 +441,9 @@ vector<InterCode> translate_arr(Node *defL){
             dec = decL->child[0];
         }
 
-        if(defL->child.size()==1){break;}
+        if(defL->child.empty()){break;}
+        def = defL->child[0];
         defL = defL->child[1];
-        def = defL -> child[0];
     }
 
     return codes;
@@ -451,7 +451,7 @@ vector<InterCode> translate_arr(Node *defL){
 
 
 InterCode translate_arr_Dec(Node *varDec){
-    if(varDec->child.size()==1){return {};}
+    if(varDec->child.size()==1){return InterCode(0);}
     while(varDec->child.size()!=1){
         varDec = varDec->child[0];
     }
@@ -462,6 +462,7 @@ InterCode translate_arr_Dec(Node *varDec){
     return InterCode(19,x,y);
 }
 
+// todo:
 // Exp -> Exp DOT Exp
 // Exp -> Exp [ Exp ]
 vector<InterCode> translate_offset(Node *exp, Operand *&op, Operand *offset){
