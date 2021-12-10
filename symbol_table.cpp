@@ -346,13 +346,18 @@ void funcArgDec(Node *varList) {
         if (symbolTable.count(varName) == 1) {
             semanticErrors(3, varList->get_lineNo());
         }
-        if (type->child.size() == 0) {
+        if (type->child.size() == 0) { // TYPE
             ptr = new Type(varName, type->get_name());
         } else {
             ptr = symbolTable[type->child[1]->get_name()];
         }
 
         if (varDec->child.size() == 1) {
+            if (ptr->category == CATEGORY::STRUCTURE) {
+                Type *tp = ptr;
+                ptr = new Type(varName, CATEGORY::STRUCTVAR);
+                ptr->set_structType(tp);
+            }
             symbolTable[varName] = ptr;
         } else {
             Type *base = ptr;

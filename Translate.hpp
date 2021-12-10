@@ -42,4 +42,8 @@ vector<InterCode> translate_Def(Node *Def);
 
 void print_codes(vector<InterCode> &ics);
 
+void translate_offset(vector<InterCode> &ics, Node *exp, Operand *&place, Operand *offset);
+
+int get_struct_offset(Type *s, const string& id);
+
 #endif //CS323_PROJ3_TRANSLATE_HPP

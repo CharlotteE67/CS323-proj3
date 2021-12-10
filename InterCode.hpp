@@ -16,8 +16,7 @@ enum class OpType {
 
 enum class AddrType {
     VALUE,
-    ADDR,
-    PTR
+    ADDR
 };
 
 class Operand {
@@ -71,6 +70,8 @@ public:
     InterCode();
 
     InterCode(int type, Operand *x = nullptr, Operand *y = nullptr, Operand *z = nullptr);
+
+    InterCode(InterCodeType type, Operand *x = nullptr, Operand *y = nullptr, Operand *z = nullptr);
 
     void print();
 };

@@ -59,17 +59,25 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
             // 3: Exp ASSIGN Exp
             if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "ASSIGN" &&
                 exp->child[2]->get_name() == "Exp") {
-                // todo: translate assignable
-                Operand *var = get_varOp(exp->child[0]->child[0]->get_name());
-                Operand *tp = new_place();
+                Operand *t1 = new_place();
+                Operand *t2 = new_place();
+                if (exp->child[0]->child.size() > 1)
+                    t1->addr_type = AddrType::ADDR;
+                ics = translate_Exp(exp->child[0], t1);
                 // code1
-                ics = translate_Exp(exp->child[2], tp);
+                auto c1 = translate_Exp(exp->child[2], t2);
+                ics.insert(ics.end(), c1.begin(), c1.end());
                 // code2
-                ics.emplace_back(3, var, tp);
                 // code3
-                ics.emplace_back(3, place, var);
+                if (t1->addr_type == AddrType::VALUE) {
+                    ics.emplace_back(3, t1, t2);
+                }
+                else {// ADDR
+                    ics.emplace_back(10, t1, t2);
+                }
+                ics.emplace_back(3, place, t1);
 //                delete place;
-//                place = var;
+//                place = t1;
             }
                 // 4: Exp PLUS Exp
             else if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "PLUS" &&
@@ -83,7 +91,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
                 ics.insert(ics.end(), c2.begin(), c2.end());
                 // code3
-                ics.emplace_back(4, t1, t2);
+                ics.emplace_back(4, place, t1, t2);
             }
                 // 5: Exp MINUS Exp
             else if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "MINUS" &&
@@ -97,7 +105,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
                 // code3
                 ics.insert(ics.end(), c2.begin(), c2.end());
-                ics.emplace_back(5, t1, t2);
+                ics.emplace_back(5, place, t1, t2);
 
             }
                 // 6: Exp MUL Exp
@@ -112,7 +120,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
                 // code3
                 ics.insert(ics.end(), c2.begin(), c2.end());
-                ics.emplace_back(6, t1, t2);
+                ics.emplace_back(6, place, t1, t2);
 
             }
                 // 7: Exp DIV Exp
@@ -127,7 +135,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 vector<InterCode> c2 = translate_Exp(exp->child[2], t2);
                 // code3
                 ics.insert(ics.end(), c2.begin(), c2.end());
-                ics.emplace_back(7, t1, t2);
+                ics.emplace_back(7, place, t1, t2);
             }
 
                 // Exp cond. Exp
@@ -162,6 +170,17 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                     ics.emplace_back(22, place, func);
                 }
             }
+            // Exp DOT ID
+            else if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "DOT" &&
+                      exp->child[2]->get_type() == Node_TYPE::ID) {
+                auto imm = new_immediate(0);
+                translate_offset(ics, exp, place, imm);
+            }
+            // LP Exp RP
+            else if (exp->child[0]->get_name() == "LP" && exp->child[1]->get_name() == "Exp" &&
+                     exp->child[2]->get_name() == "RP") {
+                ics = translate_Exp(exp->child[1], place);
+            }
             break;
         case 4:
             // ID LP Args RP
@@ -184,6 +203,12 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                     // code3
                     ics.emplace_back(22, place, func);
                 }
+            }
+            // Exp [ Exp ]
+            else if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "LB" &&
+                     exp->child[2]->get_name() == "Exp" && exp->child[3]->get_name() == "RB") {
+                auto imm = new_immediate(0);
+                translate_offset(ics, exp, place, imm);
             }
             break;
     }
@@ -451,74 +476,77 @@ vector<InterCode> translate_arr(Node *defL){
 
 
 InterCode translate_arr_Dec(Node *varDec){
-    if(varDec->child.size()==1){return InterCode(0);}
-    while(varDec->child.size()!=1){
+    while(varDec->child.size() != 1){
         varDec = varDec->child[0];
     }
-    string name = varDec->get_name();
-    int size = getTypeByName(name)->size;
+    string name = varDec->child[0]->get_name();
+    if(varDec->child.size()==1) {
+        Type *type = getTypeByName(name);
+        if (type->category == CATEGORY::PRIMITIVE)
+            return InterCode(0);
+    }
+    int size = getTypeByName(name)->getSize();
     Operand *x = get_varOp(name);
-    Operand *y = new Operand(OpType::IMMEDIATE,to_string(size));
+    Operand *y = new Operand(OpType::NAME,to_string(size));
     return InterCode(19,x,y);
 }
 
 // todo:
 // Exp -> Exp DOT Exp
 // Exp -> Exp [ Exp ]
-vector<InterCode> translate_offset(Node *exp, Operand *&op, Operand *offset){
-    vector<InterCode> ics;
+void translate_offset(vector<InterCode> &ics, Node *exp, Operand *&place, Operand *offset){
     switch (exp->child.size()) {
-        case 1:
-
+        case 1: {
+            Operand *t1 = new_place();
+            Operand *var = get_varOp(exp->child[0]->get_name());
+            ics.emplace_back(8, t1, var);
+            if (place->addr_type == AddrType::VALUE) {
+                Operand *t2 = new_place(AddrType::ADDR);
+                ics.emplace_back(4, t2, t1, offset);
+                ics.emplace_back(9, place, t2);
+            } else { // ADDR
+                ics.emplace_back(4, place, t1, offset);
+            }
             break;
-        case 3:
+        }
+        case 3: {
+            Type *st = exp->child[0]->get_varType();
+            string id = exp->child[2]->get_name();
+            Operand *ofs = new_immediate(get_struct_offset(st, id));
+            Operand *base = new_place();
+            ics.emplace_back(4, base, offset, ofs);
+            translate_offset(ics, exp->child[0], place, base);
             break;
-        case 4:
+        }
+        case 4: {
+            Operand *base = new_place();
+            Operand *ofs = new_place();
+            auto c1 = translate_Exp(exp->child[2],ofs);
+            ics.insert(ics.end(), c1.begin(), c1.end());
+            ics.emplace_back(4, base, offset, ofs);
+            translate_offset(ics, exp->child[0], place, base);
             break;
+        }
     }
-
-//    vector<Operand*> offsetList;
-//    vector<InterCode> code;
-//    while(exp->child.size()!=1){
-//        Operand *t = new_place();
-//        vector<InterCode> cal = translate_Exp(exp->child[2],t);
-//        code.insert(code.end(),cal.begin(),cal.end());
-//        offsetList.push_back(t);
-//        exp = exp->child[0];
-//    }
-//    Operand *base = new_place();
-//    translate_Exp(exp,base);
-//
-//    Type *arr = getTypeByName(exp->child[0]->get_name());
-//    Operand *sum = new Operand(OpType::IMMEDIATE,to_string(0));
-//    for (int i = offsetList.size()-1; i >= 0; i--)
-//    {
-//        /* code */
-//        arr = arr->get_next_type();
-//        Operand *t = new_place();
-//        //t = j * #size
-//        code.push_back(InterCode(6,t,offsetList[i],new Operand(OpType::IMMEDIATE,to_string(arr->size))));
-//        //sum = sum + t
-//        code.push_back(InterCode(4,sum,sum,t));
-//    }
-//
-//    //t = &base
-//    //op = t + sum
-//    Operand *tmp = new_place();
-//    code.push_back(InterCode(8,tmp,base));
-//    code.push_back(InterCode(4,op,tmp,sum));
-//
-//    return code;
-
 }
 
+int get_struct_offset(Type *s, const string& id){
+    int cnt = 0;
+    FieldList *fl = s->get_fieldList();
+    while (fl != nullptr) {
+        if (fl->name == id)
+            break;
+        cnt += fl->type->getSize();
+        fl = fl->next;
+    }
+    return cnt;
+}
 
 Operand *new_place(AddrType at) {
     switch (at) {
         case AddrType::VALUE:
             return new Operand(OpType::PLACE);
         case AddrType::ADDR:
-        case AddrType::PTR:
             return new Operand(OpType::PLACE, at);
     }
 }
@@ -536,7 +564,6 @@ Operand *get_varOp(string var, AddrType at) {
             op = new Operand(OpType::VAR);
             break;
         case AddrType::ADDR:
-        case AddrType::PTR:
             op = new Operand(OpType::VAR, at);
             break;
     }

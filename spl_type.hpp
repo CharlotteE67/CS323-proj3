@@ -7,7 +7,7 @@
 using namespace std;
 
 enum class CATEGORY {
-    PRIMITIVE, ARRAY, STRUCTURE,STRUCTVAR, FUNCTION
+    PRIMITIVE, ARRAY, STRUCTURE, STRUCTVAR, FUNCTION
 };
 enum class Primitive {
     INT,
