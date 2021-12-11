@@ -606,11 +606,14 @@ vector<InterCode> translate_FunDec(Node *funDec) {
     ics.emplace_back(2, new Operand(OpType::NAME, func_name));
     if (funDec->child.size() == 4) {
         FieldList *fieldList = symbolTable[func_name]->get_fieldList();
-        Operand *var = get_varOp(fieldList->name);
-        if (fieldList->type->is_addr_type()) {
-            var->addr_type = AddrType::ADDR;
+        while (fieldList != nullptr) {
+            Operand *var = get_varOp(fieldList->name);
+            if (fieldList->type->is_addr_type()) {
+                var->addr_type = AddrType::ADDR;
+            }
+            ics.emplace_back(20, var);
+            fieldList = fieldList->next;
         }
-        ics.emplace_back(20, var);
     }
     return ics;
 }
