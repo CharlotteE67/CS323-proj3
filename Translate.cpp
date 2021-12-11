@@ -26,9 +26,13 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                 // ID
             else if (exp->child[0]->get_type() == Node_TYPE::ID) {
                 Operand *op = get_varOp(exp->child[0]->get_name());
+                if (place->addr_type == AddrType::ADDR) {
+                    ics.emplace_back(8, place, op);
+                } else {
 //                ics.emplace_back(3, place, op);
-                delete place;
-                place = op;
+                    delete place;
+                    place = op;
+                }
             }
             break;
         case 2:
@@ -428,14 +432,20 @@ vector<InterCode> translate_cond_Exp(Node *exp, Operand *lt, Operand *lf) {
 
 vector<InterCode> translate_Args(Node *args, vector<Operand *> &argList) {
     if (args->child.size() == 1) {
-        //Exp
+        // Exp
         Operand *tp = new_place();
+        if (args->child[0]->get_varType()->is_addr_type()) {
+            tp->addr_type = AddrType::ADDR;
+        }
         vector<InterCode> code = translate_Exp(args->child[0], tp);
         argList.push_back(tp);
         return code;
     } else {
-        //Exp COMMA ARGS
+        // Exp COMMA ARGS
         Operand *tp = new_place();
+        if (args->child[0]->get_varType()->is_addr_type()) {
+            tp->addr_type = AddrType::ADDR;
+        }
         vector<InterCode> code1 = translate_Exp(args->child[0], tp);
         argList.push_back(tp);
         vector<InterCode> code2 = translate_Args(args->child[2], argList);
@@ -456,8 +466,9 @@ vector<InterCode> translate_Args(Node *args, vector<Operand *> &argList) {
 vector<InterCode> translate_arr(Node *defL){
     vector<InterCode> codes;
     if(defL->child.empty()){return codes;}
-    Node *def = defL->child[0];
-    while(true){
+//    Node *def = defL->child[0];
+    while(!defL->child.empty()){
+        Node *def = defL->child[0];
         Node *decL = def->child[1];
         Node *dec = decL->child[0];
         while(true){
@@ -471,8 +482,7 @@ vector<InterCode> translate_arr(Node *defL){
             dec = decL->child[0];
         }
 
-        if(defL->child.empty()){break;}
-        def = defL->child[0];
+//        if(defL->child.empty()){break;}
         defL = defL->child[1];
     }
 
@@ -496,7 +506,6 @@ InterCode translate_arr_Dec(Node *varDec){
     return InterCode(19,x,y);
 }
 
-// todo:
 // Exp -> Exp DOT Exp
 // Exp -> Exp [ Exp ]
 void translate_offset(vector<InterCode> &ics, Node *exp, Operand *&place, Operand *offset){
@@ -504,7 +513,12 @@ void translate_offset(vector<InterCode> &ics, Node *exp, Operand *&place, Operan
         case 1: {
             Operand *t1 = new_place();
             Operand *var = get_varOp(exp->child[0]->get_name());
-            ics.emplace_back(8, t1, var);
+            if (var->addr_type == AddrType::ADDR) {
+                ics.emplace_back(3, t1, var);
+            } else {
+                ics.emplace_back(8, t1, var);
+            }
+
             if (place->addr_type == AddrType::VALUE) {
                 Operand *t2 = new_place(AddrType::ADDR);
                 ics.emplace_back(4, t2, t1, offset);
@@ -587,6 +601,9 @@ vector<InterCode> translate_FunDec(Node *funDec) {
     if (funDec->child.size() == 4) {
         FieldList *fieldList = symbolTable[func_name]->get_fieldList();
         Operand *var = get_varOp(fieldList->name);
+        if (fieldList->type->is_addr_type()) {
+            var->addr_type = AddrType::ADDR;
+        }
         ics.emplace_back(20, var);
     }
     return ics;
