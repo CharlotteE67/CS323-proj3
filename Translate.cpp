@@ -473,7 +473,7 @@ vector<InterCode> translate_arr(Node *defL){
         Node *dec = decL->child[0];
         while(true){
             if(dec->child.size()!=1){
-                Operand *t = new_place();
+                Operand *t = new Operand(OpType::NONE);
                 vector<InterCode> tmp = translate_Exp(dec,t);
                 codes.insert(codes.end(),tmp.begin(),tmp.end());
             }else{
