@@ -61,7 +61,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
             break;
         case 3:
             // 3: Exp ASSIGN Exp
-            if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "ASSIGN" &&
+            if ((exp->child[0]->get_name() == "Exp"||exp->child[0]->get_name()=="VarDec" )&& exp->child[1]->get_name() == "ASSIGN" &&
                 exp->child[2]->get_name() == "Exp") {
                 Operand *t1 = new_place();
                 Operand *t2 = new_place();
@@ -472,11 +472,17 @@ vector<InterCode> translate_arr(Node *defL){
         Node *decL = def->child[1];
         Node *dec = decL->child[0];
         while(true){
-            
-            InterCode tmp = translate_arr_Dec(dec->child[0]);
-            if(tmp.interCodeType!=InterCodeType::NONE){
-                codes.push_back(tmp);
+            if(dec->child.size()!=1){
+                Operand *t = new Operand(OpType::NONE);
+                vector<InterCode> tmp = translate_Exp(dec,t);
+                codes.insert(codes.end(),tmp.begin(),tmp.end());
+            }else{
+                InterCode tmp = translate_arr_Dec(dec->child[0]);
+                if(tmp.interCodeType!=InterCodeType::NONE){
+                    codes.push_back(tmp);
+                }
             }
+            
             if(decL->child.size()==1){break;}
             decL = decL->child[2];
             dec = decL->child[0];
@@ -600,11 +606,14 @@ vector<InterCode> translate_FunDec(Node *funDec) {
     ics.emplace_back(2, new Operand(OpType::NAME, func_name));
     if (funDec->child.size() == 4) {
         FieldList *fieldList = symbolTable[func_name]->get_fieldList();
-        Operand *var = get_varOp(fieldList->name);
-        if (fieldList->type->is_addr_type()) {
-            var->addr_type = AddrType::ADDR;
+        while (fieldList != nullptr) {
+            Operand *var = get_varOp(fieldList->name);
+            if (fieldList->type->is_addr_type()) {
+                var->addr_type = AddrType::ADDR;
+            }
+            ics.emplace_back(20, var);
+            fieldList = fieldList->next;
         }
-        ics.emplace_back(20, var);
     }
     return ics;
 }
