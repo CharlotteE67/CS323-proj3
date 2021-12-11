@@ -58,7 +58,7 @@ public:
 
 ### C. Bonus
 
-  1. What's more, we support translating array declaration which is provided in `translate_arr()` and `translate_arr_Dec()` functions. Also, we modify the class `spl_type` and add an int member `size` for it to store the space cost for possible usages.   
+  1. What's more, we support translating array declaration which is provided in `translate_arr()` ,  and `translate_arr_Dec()` functions. Also, we modify the class `spl_type` and add an int member `size` for it to store the space cost for possible usages.   `translate_arr_addr()` are used for computing offset when fetching the address.
 
      ​										<img src="SID-Project3.assets/image-20211209211103927.png" alt="image-20211209211103927" style="zoom:50%;" /> 
 
