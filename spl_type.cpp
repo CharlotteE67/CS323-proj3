@@ -49,6 +49,10 @@ Array *Type::get_arrType() {
     return type.arr;
 }
 
+bool Type::is_addr_type() {
+    return (category == CATEGORY::STRUCTURE || category == CATEGORY::ARRAY);
+}
+
 Array::Array(Type *base, int size) : base(base), size(size) {}
 
 FieldList::FieldList() {type = nullptr; next = nullptr;}
