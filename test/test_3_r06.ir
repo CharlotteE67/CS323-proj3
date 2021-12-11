@@ -1,0 +1,17 @@
+Error type 2 at Line 6: undefined function.
+Error type 2 at Line 8: undefined function.
+FUNCTION hanoi :
+PARAM v1
+IF v1 == #1 GOTO label1
+GOTO label2
+LABEL label1 :
+GOTO label3
+LABEL label2 :
+LABEL label3 :
+RETURN #0
+FUNCTION main :
+ARG #3
+ARG #2
+ARG #1
+ARG v2
+RETURN #0

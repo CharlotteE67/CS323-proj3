@@ -1,0 +1,57 @@
+FUNCTION mod :
+PARAM v1
+RETURN v2
+FUNCTION power :
+PARAM v3
+LABEL label1 :
+t1 := v4 - v4
+t2 := t1 + #90
+t3 := t2 - #89
+t4 := t3 + #1
+t5 := t4 - #2
+IF v5 > t5 GOTO label2
+GOTO label3
+LABEL label2 :
+GOTO label1
+LABEL label3 :
+RETURN v4
+FUNCTION getNumDigits :
+PARAM v6
+IF v6 < #0 GOTO label4
+GOTO label5
+LABEL label4 :
+t6 := #0 - #1
+RETURN t6
+LABEL label5 :
+LABEL label6 :
+IF v6 > #0 GOTO label7
+GOTO label8
+LABEL label7 :
+GOTO label6
+LABEL label8 :
+RETURN v7
+FUNCTION isNarcissistic :
+PARAM v8
+LABEL label9 :
+IF v9 > #0 GOTO label10
+GOTO label11
+LABEL label10 :
+GOTO label9
+LABEL label11 :
+IF v10 == v8 GOTO label12
+GOTO label13
+LABEL label12 :
+RETURN #1
+GOTO label14
+LABEL label13 :
+RETURN #0
+LABEL label14 :
+FUNCTION main :
+LABEL label15 :
+IF v11 < #500 GOTO label16
+GOTO label17
+LABEL label16 :
+GOTO label15
+LABEL label17 :
+WRITE v12
+RETURN v12

@@ -1,0 +1,37 @@
+FUNCTION mod :
+PARAM v1
+t1 := v1 / v2
+t2 := t1 * v2
+t3 := v1 - t2
+RETURN t3
+Error type 2 at Line 10: undefined function.
+FUNCTION DigitSum :
+PARAM v3
+IF v3 == #0 GOTO label1
+GOTO label2
+LABEL label1 :
+RETURN #0
+LABEL label2 :
+ARG #10
+ARG v3
+t4 := CALL mod
+t5 := v3 / #10
+ARG t5
+t6 := CALL DigitSum
+t7 := t4 + t6
+RETURN t7
+FUNCTION main :
+READ t8
+v4 := t8
+IF v4 < #0 GOTO label3
+GOTO label4
+LABEL label3 :
+t9 := #0 - #1
+WRITE t9
+GOTO label5
+LABEL label4 :
+ARG v4
+t10 := CALL DigitSum
+WRITE t10
+LABEL label5 :
+RETURN #0
