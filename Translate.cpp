@@ -315,6 +315,11 @@ vector<InterCode> translate_Stmt(Node *stmt) {
         translate.emplace_back(11, lb1);
         translate.emplace_back(1, lb3);
     }
+    // CompStmt
+    else if (stmt->child.size() == 1){
+        vector<InterCode> code =  merge_CompSt(stmt->child[0]);
+        translate.insert(translate.end(), code.begin(), code.end());
+    }
 
     return translate;
 }
