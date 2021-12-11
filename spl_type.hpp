@@ -63,6 +63,8 @@ public:
     void set_argsList(FieldList *fieldList){ type.fl = fieldList; }
     FieldList* get_argsList(){return type.fl;}
 
+    bool is_addr_type();
+
 };
 
 class Array {
