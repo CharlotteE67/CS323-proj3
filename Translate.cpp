@@ -451,8 +451,9 @@ vector<InterCode> translate_Args(Node *args, vector<Operand *> &argList) {
 vector<InterCode> translate_arr(Node *defL){
     vector<InterCode> codes;
     if(defL->child.empty()){return codes;}
-    Node *def = defL->child[0];
-    while(true){
+//    Node *def = defL->child[0];
+    while(!defL->child.empty()){
+        Node *def = defL->child[0];
         Node *decL = def->child[1];
         Node *dec = decL->child[0];
         while(true){
@@ -466,8 +467,7 @@ vector<InterCode> translate_arr(Node *defL){
             dec = decL->child[0];
         }
 
-        if(defL->child.empty()){break;}
-        def = defL->child[0];
+//        if(defL->child.empty()){break;}
         defL = defL->child[1];
     }
 
