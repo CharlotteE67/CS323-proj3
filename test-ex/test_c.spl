@@ -1,0 +1,18 @@
+struct mix{
+  int a;
+  int b[10];
+};
+
+struct hi{
+  struct mix g[10];
+  int f;
+};
+
+int main(){
+  struct hi test;
+  test.g[0].b[0] = 19;
+  test.g[0].a = 1;
+  test.f = test.g[0].b[0] + test.g[0].a;
+  write(test.f);
+  return 0;
+}

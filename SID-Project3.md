@@ -19,15 +19,16 @@
 ```C++
 #include <string>
 using namespace std;
-enum class OpType {
-    PLACE,LABEL,VAR,IMMEDIATE,NAME,NONE
-};
+enum class OpType { PLACE,LABEL,VAR,IMMEDIATE,NAME,NONE };
+enum class AddrType { VALUE, ADDR };
 class Operand {
 public:
     OpType type;
     string name;
+    AddrType addr_type = AddrType::VALUE;
     Operand(OpType type);
     Operand(OpType type, string name);
+    Operand(OpType type, AddrType addrType);
     string get_name();
 };
 enum class InterCodeType {
@@ -64,7 +65,7 @@ public:
 
 ​													Figure.2 `translate_arr_Dec()` function
 
-​			When translating array or structure, we can start from its primitive type which is set in type constructor. Using them and the array dimensions or struct contents to count for final space cost. It's useful for TAC-19 which is `DEC x [size]` .
+​			When translating array or structure, we can start from its primitive type which is set in type constructor. Using them and the array dimensions or struct contents to count for final space cost. We design `translate_offset()` and `get_struct_offset()`  for structure and array data which need to address to access. It's useful for TAC-19 which is `DEC x [size]` .
 
 <img src="SID-Project3.assets/image-20211209211359408.png" alt="image-20211209211359408" style="zoom:50%;" />
 
@@ -74,7 +75,7 @@ public:
 
      <img src="SID-Project3.assets/image-20211209212138879.png" alt="image-20211209212138879" style="zoom:50%;" />
 
-     ​											Figure.4 Translation For Statements
+     ​											Figure.4 Translate For Statements
 
   3. 
 
@@ -86,13 +87,17 @@ public:
 
     <img src="SID-Project3.assets/image-20211209212614831.png" alt="image-20211209212614831" style="zoom:50%;" />
 
-    ​											Figure.5 Delete unnecessary instructions
+    ​											Figure.5 Remove unnecessary instructions
 
  2. 
 
 ## III. Test Cases
 
-​			For extra test cases, we put them in `./test-ex/` folder which contains four test cases. They are used for array&structure translation, for-statements translation, .......
+![image-20211211175734077](SID-Project3.assets/image-20211211175734077.png)
+
+​													Figure.6 Irsim Result for Test case 9(60614 instructions)
+
+​			For extra test cases, we put them in `./test-ex/` folder which contains four test cases. They are used for arrays&structures' translation, for-statements' translation, .......
 
 ​			**- Test case with Array Translation**
 

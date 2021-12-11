@@ -1,0 +1,13 @@
+struct a{
+  int b;
+  int c[2];
+};
+
+int main()
+{
+  struct a test;
+  test.b = 12;
+  test.c[0] = test.b + 1;
+  write(test.c[0]);
+  return 0;
+}
