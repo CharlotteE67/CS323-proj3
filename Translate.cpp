@@ -61,7 +61,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
             break;
         case 3:
             // 3: Exp ASSIGN Exp
-            if (exp->child[0]->get_name() == "Exp" && exp->child[1]->get_name() == "ASSIGN" &&
+            if ((exp->child[0]->get_name() == "Exp"||exp->child[0]->get_name()=="VarDec" )&& exp->child[1]->get_name() == "ASSIGN" &&
                 exp->child[2]->get_name() == "Exp") {
                 Operand *t1 = new_place();
                 Operand *t2 = new_place();
@@ -467,11 +467,17 @@ vector<InterCode> translate_arr(Node *defL){
         Node *decL = def->child[1];
         Node *dec = decL->child[0];
         while(true){
-            
-            InterCode tmp = translate_arr_Dec(dec->child[0]);
-            if(tmp.interCodeType!=InterCodeType::NONE){
-                codes.push_back(tmp);
+            if(dec->child.size()!=1){
+                Operand *t = new_place();
+                vector<InterCode> tmp = translate_Exp(dec,t);
+                codes.insert(codes.end(),tmp.begin(),tmp.end());
+            }else{
+                InterCode tmp = translate_arr_Dec(dec->child[0]);
+                if(tmp.interCodeType!=InterCodeType::NONE){
+                    codes.push_back(tmp);
+                }
             }
+            
             if(decL->child.size()==1){break;}
             decL = decL->child[2];
             dec = decL->child[0];
