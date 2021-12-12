@@ -72,7 +72,8 @@ ExtDef:
     | Specifier FunDec CompSt {
         vector<Node*> vec = {$1, $2, $3};
         $$ = new Node("ExtDef", @$.first_line, vec);
-        funcDec($$);
+
+        checkFuncReturn($$);
         auto ics = merge_ExtDef($$);
         print_codes(ics);
         }
@@ -111,8 +112,10 @@ FunDec:
         vector<Node*> vec = {$1, $2, $3, $4}; 
         $$ = new Node("FunDec", @$.first_line, vec); 
         funcArgDec($3);
+        funcDec($$);
         }
-    | ID LP RP { vector<Node*> vec = {$1, $2, $3}; $$ = new Node("FunDec", @$.first_line, vec); }
+    | ID LP RP { vector<Node*> vec = {$1, $2, $3}; $$ = new Node("FunDec", @$.first_line, vec);
+        funcDec($$);}
     | ID LP VarList error {puts(ERR_NO_RP.c_str());}
     | ID LP error {puts(ERR_NO_RP.c_str());}
 ;

@@ -432,41 +432,31 @@ FieldList *getFunCallArgs(Node *args) {
     return fieldList;
 }
 
+// recursive call
 /*
-*   ExtDef -> Specifier FunDec CompSt
-*   load new func into symbol table
+*   FunDec -> ID LP RP | ID LP VarList RP
 */
-void funcDec(Node *exDef) {
-    string funcName = exDef->child[1]->child[0]->get_name();
+void funcDec(Node *funDec) {
+    string funcName = funDec->child[0]->get_name();
     string returnName;
     if (symbolTable.count(funcName) != 0) {
         // func redifined
-        semanticErrors(4, exDef->get_lineNo());
+        semanticErrors(4, funDec->get_lineNo());
         return;
     }
 
     Type *funcType = new Type(funcName, CATEGORY::FUNCTION);
 
-    if (defGetTypeName(exDef) == "StructSpecifier") {
-        // struct
-        returnName = defGetStructName(exDef);
-        funcType->typePointer = new Type(funcName, symbolTable[returnName]);
-    } else {
-        returnName = defGetTypeName(exDef);
-        funcType->typePointer = new Type(funcName, returnName);
-    }
+    funcType->typePointer = new Type(funcName, "int");
 
     symbolTable[funcName] = funcType;
 
     // function arg
-    Node *funDec = exDef->child[1];
     FieldList *args = nullptr;
     if (funDec->child.size() == 4) {
         args = getFunDecArgs(funDec->child[2]);
     }
     funcType->set_argsList(args);
-
-    checkFuncReturn(exDef);
 }
 
 /*

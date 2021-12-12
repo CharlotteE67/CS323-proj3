@@ -205,6 +205,7 @@ vector<InterCode> translate_Exp(Node *exp, Operand *&place) {
                         ics.emplace_back(21, arg_list[i]);
                     }
                     // code3
+                    place->type = OpType::PLACE;
                     ics.emplace_back(22, place, func);
                 }
             }

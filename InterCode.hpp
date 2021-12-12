@@ -62,7 +62,7 @@ enum class InterCodeType {
 
 class InterCode {
 public:
-    InterCodeType interCodeType; // todo: change to enum
+    InterCodeType interCodeType;
     Operand *x{};
     Operand *y{};
     Operand *z{};

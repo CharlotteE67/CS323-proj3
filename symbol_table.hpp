@@ -36,7 +36,7 @@ void checkVarDef(Node *id, Node *parent);
 
 void checkStructDot(Node *exp);
 
-void funcDec(Node *exDef);
+void funcDec(Node *funDec);
 
 void funcArgDec(Node *varList);
 
