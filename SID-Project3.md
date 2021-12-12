@@ -71,14 +71,6 @@ public:
 
 ​													Figure.3 Set size for primitive type
 
-  2. We support `For` statements' translation which is implemented in `vector<InterCode> translate_Stmt(Node *stmt)` . Its actions are similar as `While` 's actions. 
-
-     <img src="SID-Project3.assets/image-20211209212138879.png" alt="image-20211209212138879" style="zoom:50%;" />
-
-     ​											Figure.4 Translate For Statements
-
-  3. 
-
 
 
 ### D. Optimization
@@ -87,25 +79,17 @@ public:
 
     <img src="SID-Project3.assets/image-20211209212614831.png" alt="image-20211209212614831" style="zoom:50%;" />
 
-    ​											Figure.5 Remove unnecessary instructions
-
- 2. 
+    ​											Figure.4 Remove unnecessary instructions
 
 ## III. Test Cases
 
+​		For give test cases, we generate their TAC results and simulate it with Irsim. All of them can be generated successfully and can be simulated for correct answer.
+
 ![image-20211211175734077](SID-Project3.assets/image-20211211175734077.png)
 
-​													Figure.6 Irsim Result for Test case 9(60614 instructions)
+​													Figure.5 Irsim Result for Test case 9(60614 instructions)
 
-​			For extra test cases, we put them in `./test-ex/` folder which contains four test cases. They are used for arrays&structures' translation, for-statements' translation, .......
-
-​			**- Test case with Array Translation**
-
-```SPL
-// TBD
------------------------------------------------
-// TBD
-```
+​			For extra test cases, we put them in `./test-ex/` folder which contains four test cases. They are used for arrays&structures' translation.
 
 
 
