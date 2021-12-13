@@ -71,6 +71,29 @@ public:
 
 ​													Figure.3 Set size for primitive type
 
+​			Since we accept the translation for array and structure data type, it's acceptable for arrays which contain structure elements and structures which contain array member, which means that we can translate the mixture of arrays and structures. Test case is shown in `test_c.spl` .
+
+```SPL
+struct mix{
+  int a;
+  int b[10];
+};
+
+struct hi{
+  struct mix g[10];
+  int f;
+};
+
+int main(){
+  struct hi test;
+  test.g[0].b[0] = 19;
+  test.g[0].a = 1;
+  test.f = test.g[0].b[0] + test.g[0].a;
+  write(test.f);
+  return 0;
+}
+```
+
 
 
 ### D. Optimization
